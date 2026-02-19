@@ -276,4 +276,5 @@ return [
 	'Joomla\\Plugin\\Workflow\\Featuring\\' => [JPATH_PLUGINS . '/workflow/featuring/src'],
 	'Joomla\\Plugin\\Workflow\\Notification\\' => [JPATH_PLUGINS . '/workflow/notification/src'],
 	'Joomla\\Plugin\\Workflow\\Publishing\\' => [JPATH_PLUGINS . '/workflow/publishing/src'],
+	'Tjqueue\\Component\\Tjqueue\\Administrator\\' => [JPATH_ADMINISTRATOR . '/components/com_tjqueue/src'],
 ];
