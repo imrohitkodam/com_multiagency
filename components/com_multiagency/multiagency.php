@@ -23,7 +23,20 @@ Multiagency::utilities()->getLanguageConstant();
 
 JLoader::register('MultiagencyController', JPATH_ROOT . '/components/com_multiagency/controller.php');
 JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
+
+// Load RBACL stub if com_subusers is not installed
+if (!class_exists('RBACL'))
+{
+	require_once JPATH_SITE . '/components/com_multiagency/helpers/rbacl_stub.php';
+}
+
 JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
+
+// Load Cluster stub if com_cluster is not installed
+if (!class_exists('ClusterFactory'))
+{
+	require_once JPATH_SITE . '/components/com_multiagency/helpers/cluster_stub.php';
+}
 
 // Execute the task.
 $controller = BaseController::getInstance('Multiagency');

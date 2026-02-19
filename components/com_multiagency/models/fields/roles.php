@@ -17,14 +17,22 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Component\ComponentHelper;
 
-Joomla\CMS\Form\FormHelper::loadFieldClass('list');
+use Joomla\CMS\Form\Field\ListField;
+
+JLoader::import('components.com_subusers.includes.rbacl', JPATH_ADMINISTRATOR);
+
+// Load RBACL stub if com_subusers is not installed
+if (!class_exists('RBACL'))
+{
+	require_once JPATH_SITE . '/components/com_multiagency/helpers/rbacl_stub.php';
+}
 
 /**
  * Supports an HTML select list of allocated agencies
  *
  * @since  __DEPLOY_VERSION__
  */
-class JFormFieldRoles extends JFormFieldList
+class JFormFieldRoles extends ListField
 {
 	/**
 	 * The form field type.
@@ -130,12 +138,14 @@ class JFormFieldRoles extends JFormFieldList
 		// Initialize array to store dropdown options
 		$options = array();
 
+		$roles = array();
+
 		if ($agencyId)
 		{
 			$userFormModel = BaseDatabaseModel::getInstance('UserForm', 'MultiagencyModel', array('ignore_request' => true));
 			$roles = $userFormModel->getUserAgencyRole($agencyId);
 		}
-		else
+		elseif (ComponentHelper::isEnabled('com_subusers'))
 		{
 			$db = Factory::getDBO();
 			$subInQuery = $db->getQuery(true);

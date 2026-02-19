@@ -9,6 +9,7 @@
 
 // No direct access
 defined('_JEXEC') or die;
+use Joomla\CMS\Component\Router\RouterBase;
 
 JLoader::registerPrefix('Multiagency', JPATH_SITE . '/components/com_multiagency/');
 
@@ -17,7 +18,7 @@ JLoader::registerPrefix('Multiagency', JPATH_SITE . '/components/com_multiagency
  *
  * @since  3.3
  */
-class MultiagencyRouter extends JComponentRouterBase
+class MultiagencyRouter extends RouterBase
 {
 	/**
 	 * Build method for URLs

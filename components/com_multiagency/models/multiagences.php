@@ -11,6 +11,7 @@
 defined('_JEXEC') or die;
 use Joomla\Data\DataObject;
 
+use Joomla\CMS\Component\ComponentHelper;
 jimport('joomla.application.component.modellist');
 use Joomla\CMS\MVC\Model\ListModel;
 use Joomla\CMS\Factory;
@@ -127,13 +128,19 @@ class MultiagencyModelMultiagences extends ListModel
 		$db    = $this->getDbo();
 		$query = $db->getQuery(true);
 
+		$managerCountSubquery = '0 as manager_count';
+
+		if (ComponentHelper::isEnabled('com_subusers'))
+		{
+			$managerCountSubquery = '(SELECT count(DISTINCT(su.user_id)) FROM #__tjsu_users AS su, #__users AS u WHERE u.id = su.user_id
+					AND u.block = 0 AND su.client_id = a.id AND client="com_multiagency" ) as manager_count';
+		}
+
 		// Select the required fields from the table.
 		$query
 			->select(
 				$this->getState(
-					'list.select', 'DISTINCT a.*,
-					(SELECT count(DISTINCT(su.user_id)) FROM #__tjsu_users AS su, #__users AS u WHERE u.id = su.user_id
-					AND u.block = 0 AND su.client_id = a.id AND client="com_multiagency" ) as manager_count'
+					'list.select', 'DISTINCT a.*, ' . $managerCountSubquery
 				)
 			);
 		$query->from($db->qn('#__tjmultiagency_multiagency', 'a'));

@@ -134,6 +134,12 @@ class MultiagencyControllerUserForm extends FormController
 		// Allow to users to create Trustee who have access to all cluseter
 		$postDataRoleList = array_column($data['agency_role_map'], 'rolelist');
 
+		// Load RBACL stub if com_subusers is not installed
+		if (!class_exists('RBACL'))
+		{
+			require_once JPATH_SITE . '/components/com_multiagency/helpers/rbacl_stub.php';
+		}
+
 		// Get subusers actions mapp
 		$userRoleId = RBACL::getRoleByUser($userId, 'com_multiagency', 0);
 		
@@ -262,20 +268,29 @@ class MultiagencyControllerUserForm extends FormController
 			$row['client_id'] = (int) $clientId;
 
 
-			if (!empty($data['jobtitle'])) {
-				BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_cluster/models');
-				$clusterModel = BaseDatabaseModel::getInstance('Cluster', 'ClusterModel');
-				$clusterId   = $clusterModel->getClusterByClient($client=null, $clientId);
+			if (!empty($data['jobtitle']) && ComponentHelper::isEnabled('com_dpe')) {
+				
+				$clusterModel = null;
+				if (ComponentHelper::isEnabled('com_cluster')) {
+					BaseDatabaseModel::addIncludePath(JPATH_ADMINISTRATOR.'/components/com_cluster/models');
+					$clusterModel = BaseDatabaseModel::getInstance('Cluster', 'ClusterModel');
+				}
 
-				BaseDatabaseModel::addIncludePath(JPATH_ROOT . '/components/com_dpe/models');
-				$schoolModel = BaseDatabaseModel::getInstance('School', 'DpeModel');
-				$jobTitle = $schoolModel->getJobTitlesByClusterId($clusterId->id);	
+				if ($clusterModel) {
+					$clusterId   = $clusterModel->getClusterByClient($client=null, $clientId);
 
-				$jobIds = array_column(json_decode(json_encode($jobTitle), true), 'id');
+					BaseDatabaseModel::addIncludePath(JPATH_ROOT . '/components/com_dpe/models');
+					$schoolModel = BaseDatabaseModel::getInstance('School', 'DpeModel');
+					if ($schoolModel) {
+						$jobTitle = $schoolModel->getJobTitlesByClusterId($clusterId->id);	
 
-				// Check if jobtitle exists
-				if (in_array($data['jobtitle'], $jobIds)) {
-					$row['jobtitle'] = $data['jobtitle'];
+						$jobIds = array_column(json_decode(json_encode($jobTitle), true), 'id');
+
+						// Check if jobtitle exists
+						if (in_array($data['jobtitle'], $jobIds)) {
+							$row['jobtitle'] = $data['jobtitle'];
+						}
+					}
 				}
 			}
 
@@ -346,30 +361,37 @@ class MultiagencyControllerUserForm extends FormController
 		if ($return)
 		{
 			// DPE jobtitle work
-			BaseDatabaseModel::addIncludePath(JPATH_ROOT . '/components/com_dpe/models');
-			$schoolModel = BaseDatabaseModel::getInstance('School', 'DpeModel');
-			$userId     = empty($return) ? $data['id']: $return; 
+			if (ComponentHelper::isEnabled('com_dpe'))
+			{
+				BaseDatabaseModel::addIncludePath(JPATH_ROOT . '/components/com_dpe/models');
+				$schoolModel = BaseDatabaseModel::getInstance('School', 'DpeModel');
+				$userId     = empty($return) ? $data['id']: $return; 
 
-			
-			$listOfValidData = array_values($validData['agency_role_map']);
+				
+				$listOfValidData = array_values($validData['agency_role_map']);
 
-			for ($index = 0; $index < count($listOfValidData); $index++)
-			{ 
-				Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_cluster/tables');
-			    $clustertableInstance  = Table::getInstance('Clusters', 'ClusterTable');
-				$clustertableInstance->load(array('client_id' => $listOfValidData[$index]['client_id']));
-			    $clusterId = $clustertableInstance->id;
-			    $schoolModels = BaseDatabaseModel::getInstance('School', 'DpeModel');
-				$userJobTitle = $schoolModels->getJobTitlebyUserData($clusterId, $userId);
+				for ($index = 0; $index < count($listOfValidData); $index++)
+				{ 
+					Table::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_cluster/tables');
+					$clustertableInstance  = Table::getInstance('Clusters', 'ClusterTable');
+					$clustertableInstance->load(array('client_id' => $listOfValidData[$index]['client_id']));
+					$clusterId = $clustertableInstance->id;
+					
+					if ($schoolModel) {
+						$userJobTitle = $schoolModel->getJobTitlebyUserData($clusterId, $userId);
 
-				$oldJobtitleStatus[$index] = $userJobTitle['ucm_id'];
+						$oldJobtitleStatus[$index] = $userJobTitle['ucm_id'];
 
-				$key = 'agency_role_map' . $index;
-				$usersJobtitleData[$index] = array('clusterId' => $listOfValidData[$index]['client_id'], 
-												'user_id' => $return, 'ucm_id' => $listOfValidData[$index]['jobtitle'],'dpelead' =>$listOfValidData[$index]['dpelead']);
+						$key = 'agency_role_map' . $index;
+						$usersJobtitleData[$index] = array('clusterId' => $listOfValidData[$index]['client_id'], 
+														'user_id' => $return, 'ucm_id' => $listOfValidData[$index]['jobtitle'],'dpelead' =>$listOfValidData[$index]['dpelead']);
+					}
+				}
+
+				if ($schoolModel) {
+					$saveResult = $schoolModel->saveUsersJobTitleDetails($usersJobtitleData, $userId);
+				}
 			}
-
-			$saveResult = $schoolModel->saveUsersJobTitleDetails($usersJobtitleData, $userId);
 
 			// DPE jobtitle work end;
 			$validData['id'] = $return;

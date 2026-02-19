@@ -8,6 +8,7 @@
  */
 
 use Joomla\CMS\Response\JsonResponse;
+use Joomla\CMS\Component\ComponentHelper;
 
 // No direct access
 defined('_JEXEC') or die;
@@ -322,42 +323,43 @@ class MultiagencyControllerLicenceForm extends FormController
 	{
 		$app = Factory::getApplication();
 		$multiagencyId = $app->getInput()->getInt('multiagencyId');
-
 		$user = Factory::getUser();
-
-		$db = Factory::getDbo();
-		$query = $db->getQuery(true);
-		$query->select('course_id');
-		$query->from($db->quoteName('#__tjmultiagency_licences'));
-		$query->where($db->quoteName('multiagency_id') . '=' . $db->quote($multiagencyId));
-		$query->where($db->quoteName('created_by') . '=' . $db->quote($user->id));
-		$query->where($db->quoteName('state') . '=1');
-		$db->setQuery($query);
-		$assignCourse = $db->loadColumn();
-		$query = $db->getQuery(true);
-
-		// Select the required fields from the table.
-		$query->select('c.id, c.title');
-		$query->from('`#__tjlms_courses` AS c');
-		$query->where('c.state = 1');
-
-		$query->where('c.created_by = "' . $user->id . '" AND c.type = 1');
-
-		if (count($assignCourse) > 0)
-		{
-			$query->where('c.id' . " NOT IN(" . implode(',', $db->quote($assignCourse)) . ")");
-		}
-
-		$query->order($db->escape('c.title ASC'));
-
-		$db->setQuery($query);
-		$courses = $db->loadObjectList();
-
 		$options = '<option value="" selected="selected">' . Text::_('COM_TJLMS_COUPON_COURSE') . '</option>';
 
-		foreach ($courses as $course)
+		if (ComponentHelper::isEnabled('com_tjlms'))
 		{
-			$options .= '<option value="' . $course->id . '">' . $course->title . '</option>';
+			$db = Factory::getDbo();
+			$query = $db->getQuery(true);
+			$query->select('course_id');
+			$query->from($db->quoteName('#__tjmultiagency_licences'));
+			$query->where($db->quoteName('multiagency_id') . '=' . $db->quote($multiagencyId));
+			$query->where($db->quoteName('created_by') . '=' . $db->quote($user->id));
+			$query->where($db->quoteName('state') . '=1');
+			$db->setQuery($query);
+			$assignCourse = $db->loadColumn();
+			$query = $db->getQuery(true);
+
+			// Select the required fields from the table.
+			$query->select('c.id, c.title');
+			$query->from('`#__tjlms_courses` AS c');
+			$query->where('c.state = 1');
+
+			$query->where('c.created_by = "' . $user->id . '" AND c.type = 1');
+
+			if (count($assignCourse) > 0)
+			{
+				$query->where('c.id' . " NOT IN(" . implode(',', $db->quote($assignCourse)) . ")");
+			}
+
+			$query->order($db->escape('c.title ASC'));
+
+			$db->setQuery($query);
+			$courses = $db->loadObjectList();
+
+			foreach ($courses as $course)
+			{
+				$options .= '<option value="' . $course->id . '">' . $course->title . '</option>';
+			}
 		}
 
 		echo json_encode($options);

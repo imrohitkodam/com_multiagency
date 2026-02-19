@@ -9,15 +9,12 @@
  */
 
 defined('_JEXEC') or die;
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\Factory;
-use Joomla\CMS\Router\Route;
-
 // No direct access
-JLoader::register('FieldsHelper', JPATH_ADMINISTRATOR . '/components/com_fields/helpers/fields.php');
+
+\JLoader::register('FieldsHelper', JPATH_ADMINISTRATOR . '/components/com_fields/helpers/fields.php');
 
 // Get create Agency list menu
-$mainframe          = Factory::getApplication();
+$mainframe          = \Joomla\CMS\Factory::getApplication();
 $menu               = $mainframe->getMenu();
 $agencyListMenuItem = $menu->getItems('link', 'index.php?option=com_dpe&view=schools', true );
 ?>
@@ -35,11 +32,11 @@ $agencyListMenuItem = $menu->getItems('link', 'index.php?option=com_dpe&view=sch
 	<?php endforeach ?>
 	<?php else: ?>
 		<h2>
-			<?php echo Text::sprintf('COM_MULTIAGENCY_ADD_ITEM', Text::_('COM_MULTIAGENCY_ORGANISATION')); ?>
+			<?php echo \Joomla\CMS\Language\Text::sprintf('COM_MULTIAGENCY_ADD_ITEM', \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_ORGANISATION')); ?>
 		</h2>
 <?php endif; ?>
 </div>
 
-<a class="mt-20 btn btn-primary mobile-space" href="<?php echo Route::_('index.php?option=com_dpe&view=schools&filter[cluster_id]=all&Itemid=' . $agencyListMenuItem->id, false, 0); ?>"><i class="fa fa-arrow-left mr-10" aria-hidden="true"></i><?php echo Text::_('COM_DPE_BACK_BUTTON'); ?></a>
+<a class="mt-20 btn btn-primary mobile-space" href="<?php echo \Joomla\CMS\Router\Route::_('index.php?option=com_dpe&view=schools&filter[cluster_id]=all&Itemid=' . $agencyListMenuItem->id, false, 0); ?>"><i class="fa fa-arrow-left mr-10" aria-hidden="true"></i><?php echo \Joomla\CMS\Language\Text::_('COM_DPE_BACK_BUTTON'); ?></a>
 
 <?php

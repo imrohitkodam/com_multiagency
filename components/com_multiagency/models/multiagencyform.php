@@ -24,6 +24,12 @@ use Joomla\CMS\Plugin\PluginHelper;
 use Joomla\CMS\Helper\TagsHelper;
 
 JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
+
+// Load RBACL stub if com_subusers is not installed
+if (!class_exists('RBACL'))
+{
+	require_once JPATH_SITE . '/components/com_multiagency/helpers/rbacl_stub.php';
+}
 /**
  * MultiagencyForm model
  *
@@ -122,7 +128,7 @@ class MultiagencyModelMultiagencyForm extends FormModel
 
 				// Convert the JTable to a clean JObject.
 				$properties = $table->getProperties(1);
-				$this->item = ArrayHelper::toObject($properties, 'JObject');
+				$this->item = ArrayHelper::toObject($properties, \stdClass::class);
 
 				//DPE hack can go in core
 				$this->item->tags = new TagsHelper;
@@ -528,7 +534,7 @@ class MultiagencyModelMultiagencyForm extends FormModel
 		$managerList = array();
 
 		// Get com_subusers component status
-		if (ComponentHelper::getComponent('com_subusers', true)->enabled)
+		if (ComponentHelper::isEnabled('com_subusers'))
 		{
 			// Get record by using multiagency id
 			$managerIds = $this->loadSubFormData($pk, 1, 'com_multiagency');

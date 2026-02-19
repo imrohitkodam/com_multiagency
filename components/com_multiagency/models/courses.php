@@ -12,6 +12,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\Data\DataObject;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Component\ComponentHelper;
 
 jimport('joomla.application.component.modellist');
 
@@ -135,17 +136,32 @@ class MultiagencyModelCourses extends ListModel
 		$query = $db->getQuery(true);
 
 		// Select the required fields from the table.
+		$selectCols = 'DISTINCT a.*';
+
+		if (ComponentHelper::isEnabled('com_tjlms'))
+		{
+			$selectCols .= ', b.title, b.access';
+		}
+		else
+		{
+			$selectCols .= ', NULL AS title, 0 AS access';
+		}
+
 		$query
 			->select(
 				$this->getState(
-					'list.select', 'DISTINCT a.*, b.title, b.access'
+					'list.select', $selectCols
 				)
 			);
 
 		$query->from('`#__tjmultiagency_licences` AS a');
 
-		// Join over the users for the checked out user.
-		$query->join('LEFT', '#__tjlms_courses AS b ON a.course_id = b.id');
+		if (ComponentHelper::isEnabled('com_tjlms'))
+		{
+			// Join over the users for the checked out user.
+			$query->join('LEFT', '#__tjlms_courses AS b ON a.course_id = b.id');
+		}
+
 		$query->join('INNER', '#__tjmultiagency_multiagency AS c ON a.multiagency_id = c.id');
 
 		// Filter by search in title
@@ -158,7 +174,7 @@ class MultiagencyModelCourses extends ListModel
 			{
 				$query->where('a.id = ' . (int) substr($search, 3));
 			}
-			else
+			elseif (ComponentHelper::isEnabled('com_tjlms'))
 			{
 				$search = $db->Quote('%' . $db->escape($search, true) . '%');
 				$query->where($db->quoteName('b.title') . ' LIKE ' . $search);

@@ -10,28 +10,24 @@
 
 // No direct access
 defined('_JEXEC') or die;
-use Joomla\CMS\Table\Table;
 
-use Joomla\CMS\Factory;
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\Router\Route;
-use Joomla\CMS\HTML\HTMLHelper;
 
-HTMLHelper::_('behavior.keepalive');
-HTMLHelper::_('bootstrap.tooltip');
-HTMLHelper::_('behavior.formvalidator');
-HTMLHelper::_('formbehavior.chosen', 'select');
 
-HTMLHelper::script('media/com_multiagency/js/user.min.js');
-HTMLHelper::script('media/com_dpe/js/dpe.min.js');
-Text::script('COM_USER_TITLE_MANAGEENROLLMENTS_IMPORT_ALREADY_ASSIGNED');
-Text::script('COM_MULTIAGENCY_INTERACTION_AJAX_ERROR');
-Text::script('COM_USER_TITLE_MANAGEENROLLMENTS_IMPORT_UPDATED');
+\Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
+\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');
+
+
+\Joomla\CMS\HTML\HTMLHelper::script('media/com_multiagency/js/user.min.js');
+\Joomla\CMS\HTML\HTMLHelper::script('media/com_dpe/js/dpe.min.js');
+\Joomla\CMS\Language\Text::script('COM_USER_TITLE_MANAGEENROLLMENTS_IMPORT_ALREADY_ASSIGNED');
+\Joomla\CMS\Language\Text::script('COM_MULTIAGENCY_INTERACTION_AJAX_ERROR');
+\Joomla\CMS\Language\Text::script('COM_USER_TITLE_MANAGEENROLLMENTS_IMPORT_UPDATED');
 
 // Get user groups as per name
-$leadConsultantGroup = Table::getInstance('Usergroup', 'JTable');
+$leadConsultantGroup = \Joomla\CMS\Table\Table::getInstance('Usergroup', 'JTable');
 $leadConsultantGroup->load(array('title' => 'External Lead Consultant'));
-$userGroups            = Factory::getUser($this->item->id)->groups;
+$userGroups            = \Joomla\CMS\Factory::getUser($this->item->id)->groups;
 $leadConsultantGroupId = 0;
 $isLeadConsultant      = false;
 $isViewOnly            = false;
@@ -57,17 +53,17 @@ if (!empty($this->item->id) && (($this->user->id == $this->item->id) || $isLeadC
 	<div class="page-header">
 		<h2>
 			<?php if ($isViewOnly): ?>
-				<?php echo Text::_('COM_MULTIAGENCY_VIEW_USER'); ?>
+				<?php echo \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_VIEW_USER'); ?>
 			<?php elseif (!empty($this->item->id)): ?>
-				<?php echo Text::_('COM_MULTIAGENCY_EDIT_USER'); ?>
+				<?php echo \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_EDIT_USER'); ?>
 			<?php else: ?>
-				<?php echo Text::_('COM_MULTIAGENCY_ADD_MULTIAGENCY_USER'); ?>
+				<?php echo \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_ADD_MULTIAGENCY_USER'); ?>
 			<?php endif; ?>
 		</h2>
 	</div>
 </div>
 
-<form id="form-user" action="<?php echo Route::_('index.php?option=com_multiagency&task=userform.save'); ?>" method="post" class="form-validate form-horizontal ucm-form-styling" enctype="multipart/form-data">
+<form id="form-user" action="<?php echo \Joomla\CMS\Router\Route::_('index.php?option=com_multiagency&task=userform.save'); ?>" method="post" class="form-validate form-horizontal ucm-form-styling" enctype="multipart/form-data">
 	<div class="row users-edit">
 		<div class="col-sm-7 col-md-5">
 			<div class="control-group"><?php echo $this->form->renderField('name'); ?></div>
@@ -86,10 +82,10 @@ if (!empty($this->item->id) && (($this->user->id == $this->item->id) || $isLeadC
 				<div class="control-group md-w-52">
 					<div class="controls text-right">
 						<?php if (!$isViewOnly) { ?>
-						<button type="submit" onclick="return checkDuplicates();" class="validate btn btn-primary"><?php echo Text::_('JSUBMIT'); ?></button>
+						<button type="submit" onclick="return checkDuplicates();" class="validate btn btn-primary"><?php echo \Joomla\CMS\Language\Text::_('JSUBMIT'); ?></button>
 						<?php } ?>
-						<a class="btn btn-default" href="<?php echo Route::_('index.php?option=com_multiagency&view=users'); ?>"title="<?php echo Text::_('JCANCEL'); ?>">
-							<?php echo Text::_('JCANCEL'); ?>
+						<a class="btn btn-default" href="<?php echo \Joomla\CMS\Router\Route::_('index.php?option=com_multiagency&view=users'); ?>"title="<?php echo \Joomla\CMS\Language\Text::_('JCANCEL'); ?>">
+							<?php echo \Joomla\CMS\Language\Text::_('JCANCEL'); ?>
 						</a>
 					</div>
 				</div>
@@ -106,8 +102,8 @@ if (!empty($this->item->id) && (($this->user->id == $this->item->id) || $isLeadC
 			<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
 			<input type="hidden" name="option" value="com_multiagency"/>
 			<input type="hidden" name="task" value="userform.save"/>
-			<?php echo HTMLHelper::_('form.token'); ?>
-			<?php echo HTMLHelper::_( 'jquery.token'); ?>
+			<?php echo \Joomla\CMS\HTML\HTMLHelper::_('form.token'); ?>
+			<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'jquery.token'); ?>
 		</div>
 	</div>
 </form>

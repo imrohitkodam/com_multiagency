@@ -123,7 +123,7 @@ class MultiagencyModelLicence extends ItemModel
 
 				// Convert the JTable to a clean JObject.
 				$properties  = $table->getProperties(1);
-				$this->_item = ArrayHelper::toObject($properties, 'JObject');
+				$this->_item = ArrayHelper::toObject($properties, \stdClass::class);
 			}
 		}
 

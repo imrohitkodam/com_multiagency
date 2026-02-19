@@ -122,7 +122,7 @@ class MultiagencyModelMultiagency extends ItemModel
 
 				// Convert the JTable to a clean JObject.
 				$properties  = $table->getProperties(1);
-				$this->_item = ArrayHelper::toObject($properties, 'JObject');
+				$this->_item = ArrayHelper::toObject($properties, \stdClass::class);
 			}
 		}
 
@@ -314,6 +314,12 @@ class MultiagencyModelMultiagency extends ItemModel
 
 		JLoader::import("components.com_subusers.includes.rbacl", JPATH_ADMINISTRATOR);
 
+		// Load RBACL stub if com_subusers is not installed
+		if (!class_exists('RBACL'))
+		{
+			require_once JPATH_SITE . '/components/com_multiagency/helpers/rbacl_stub.php';
+		}
+
 		if ($userId == null)
 		{
 			$userId = $user->id;
@@ -328,7 +334,7 @@ class MultiagencyModelMultiagency extends ItemModel
 		$query->from($db->quoteName('#__tjmultiagency_multiagency') . ' AS ml');
 
 		// Show all schools to dpeadmin or where the all schools needed
-		if (!$options['schools_without_license'])
+		if (!$options['schools_without_license'] && ComponentHelper::isEnabled('com_subusers'))
 		{
 			$query->select('su.role_id');
 			$query->join('INNER', $db->quoteName('#__tjsu_users', 'su') . ' ON (' . $db->quoteName('su.client_id') . ' = ' . $db->quoteName('ml.id') . ')');

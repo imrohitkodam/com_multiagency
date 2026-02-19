@@ -13,15 +13,16 @@ use Joomla\CMS\Form\FormHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Component\ComponentHelper;
 
-Joomla\CMS\Form\FormHelper::loadFieldClass('list');
+use Joomla\CMS\Form\Field\ListField;
 
 /**
  * Supports an HTML select list of courses
  *
  * @since  1.6
  */
-class JFormFieldCourses extends JFormFieldList
+class JFormFieldCourses extends ListField
 {
 	/**
 	 * The form field type.
@@ -52,6 +53,12 @@ class JFormFieldCourses extends JFormFieldList
 		$jinput = Factory::getApplication()->getInput();
 		$user = Factory::getUser();
 		$viewname = $jinput->get('view', '', 'STR');
+
+		if (!ComponentHelper::isEnabled('com_tjlms'))
+		{
+			return array(HTMLHelper::_('select.option', "", Text::_('COM_TJLMS_COUPON_COURSE')));
+		}
+
 		$query = $db->getQuery(true);
 
 		// Select the required fields from the table.

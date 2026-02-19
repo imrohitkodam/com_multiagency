@@ -52,14 +52,19 @@ class MultiagencyViewMultiagences extends HtmlView
 
 		$path = JPATH_SITE . '/components/com_tjfields/helpers/geo.php';
 
-		if (!class_exists('tmtTestsHelper'))
+		if (file_exists($path))
 		{
-			// Require_once $path
-			JLoader::register('TjGeoHelper', $path);
-			JLoader::load('TjGeoHelper');
-		}
+			if (!class_exists('TjGeoHelper'))
+			{
+				JLoader::register('TjGeoHelper', $path);
+				JLoader::load('TjGeoHelper');
+			}
 
-		$this->tjGeoHelper = TjGeoHelper::getInstance('TjGeoHelper');
+			if (class_exists('TjGeoHelper'))
+			{
+				$this->tjGeoHelper = TjGeoHelper::getInstance('TjGeoHelper');
+			}
+		}
 
 		MultiagencyHelpersMultiagency::addSubmenu('multiagences');
 
@@ -177,7 +182,6 @@ class MultiagencyViewMultiagences extends HtmlView
 			'a.`ordering`' => Text::_('JGRID_HEADING_ORDERING'),
 			'a.`state`' => Text::_('JSTATUS'),
 			'a.`title`' => Text::_('COM_MULTIAGENCY_MULTIAGENCES_TITLE'),
-			'a.`manager_id`' => Text::_('COM_MULTIAGENCY_MULTIAGENCES_MANAGER_ID'),
 			'a.`country_id`' => Text::_('COM_MULTIAGENCY_MULTIAGENCES_COUNTRY_ID'),
 			'a.`state_id`' => Text::_('COM_MULTIAGENCY_MULTIAGENCES_STATE_ID'),
 		);

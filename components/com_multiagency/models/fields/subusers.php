@@ -13,14 +13,20 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Factory;
 
-Joomla\CMS\Form\FormHelper::loadFieldClass('list');
+use Joomla\CMS\Form\Field\ListField;
 JLoader::import('components.com_subusers.includes.rbacl', JPATH_ADMINISTRATOR);
+
+// Load RBACL stub if com_subusers is not installed
+if (!class_exists('RBACL'))
+{
+	require_once JPATH_SITE . '/components/com_multiagency/helpers/rbacl_stub.php';
+}
 /**
  * Supports an HTML select list of allocated agencies
  *
  * @since  __DEPLOY_VERSION__
  */
-class JFormFieldSubusers extends JFormFieldList
+class JFormFieldSubusers extends ListField
 {
 	/**
 	 * The form field type.

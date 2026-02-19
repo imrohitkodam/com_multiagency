@@ -11,16 +11,23 @@ defined('JPATH_BASE') or die;
 use Joomla\CMS\Form\FormField;
 use Joomla\CMS\Table\Table;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Form\Field\ListField;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 
 JLoader::import('components.com_subusers.includes.rbacl', JPATH_ADMINISTRATOR);
+
+// Load RBACL stub if com_subusers is not installed
+if (!class_exists('RBACL'))
+{
+	require_once JPATH_SITE . '/components/com_multiagency/helpers/rbacl_stub.php';
+}
 /**
  * Supports an HTML select list of allocated agencies
  *
  * @since  __DEPLOY_VERSION__
  */
-class JFormFieldDepeadmin extends JFormFieldList
+class JFormFieldDepeadmin extends ListField
 {
 	/**
 	 * The form field type.

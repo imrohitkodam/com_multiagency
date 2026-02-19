@@ -9,27 +9,20 @@
 
 // No direct access
 defined('_JEXEC') or die;
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\Factory;
-use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Router\Route;
 
-use Joomla\CMS\Uri\Uri;
-use Joomla\CMS\Component\ComponentHelper;
+\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');
 
-HTMLHelper::_('behavior.formvalidator');
-HTMLHelper::_('formbehavior.chosen', 'select');
-HTMLHelper::script('media/com_multiagency/js/licence.js' );
+\Joomla\CMS\HTML\HTMLHelper::script('media/com_multiagency/js/licence.js' );
 
 // Load admin language file
-$lang = Factory::getLanguage();
+$lang = \Joomla\CMS\Factory::getLanguage();
 $lang->load('com_multiagency', JPATH_SITE);
-$UriRoot = Uri::root();
-$user    = Factory::getUser();
+$UriRoot = \Joomla\CMS\Uri\Uri::root();
+$user    = \Joomla\CMS\Factory::getUser();
 
 $canEdit    = $user->authorise('core.edit', 'com_multiagency');
 
-$tjlmsExtention = ComponentHelper::getComponent('com_tjlms', true);
+$tjlmsExtention = \Joomla\CMS\Component\ComponentHelper::getComponent('com_tjlms', true);
 ?>
 
 <script type="text/javascript">
@@ -53,13 +46,13 @@ function validateLicences()
 		{
 			if (response.data.type === 'all')
 			{
-				alert("<?php echo Text::_('COM_MULTIAGENCY_ALL_ALREADY_PRESENT_EDIT_ERROR'); ?>");
+				alert("<?php echo \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_ALL_ALREADY_PRESENT_EDIT_ERROR'); ?>");
 
 			}
 
 			if(response.data.type === 'per')
 			{
-				alert("<?php echo Text::sprintf('COM_MULTIAGENCY_ALREADY_PRESENT_EDIT_ERROR', Text::_('COM_MULTIAGENCY_ORGANISATION')); ?>");
+				alert("<?php echo \Joomla\CMS\Language\Text::sprintf('COM_MULTIAGENCY_ALREADY_PRESENT_EDIT_ERROR', \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_ORGANISATION')); ?>");
 				return false;
 			}
 
@@ -123,12 +116,12 @@ jQuery( document ).ready(function() {
 
 <div class="licence-edit front-end-edit">
 		<?php if (!$canEdit) : ?>
-			<h3><?php throw new Exception(Text::_('COM_MULTIAGENCY_ERROR_MESSAGE_NOT_AUTHORISED'), 403); ?></h3>
+			<h3><?php throw new Exception(\Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_ERROR_MESSAGE_NOT_AUTHORISED'), 403); ?></h3>
 		<?php else : ?>
 		<?php if (!empty($this->item->id)): ?>
-			<div class="page-header"><h2 itemprop="name"><?php echo Text::_('COM_MULTIAGENCY_EDIT_ITEM_TITLE_LICENCES'); ?></h2></div>
+			<div class="page-header"><h2 itemprop="name"><?php echo \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_EDIT_ITEM_TITLE_LICENCES'); ?></h2></div>
 		<?php else: ?>
-			<div class="page-header"><h2 itemprop="name"><?php echo Text::_('COM_MULTIAGENCY_ADD_ITEM_LICENCE'); ?></h2></div>
+			<div class="page-header"><h2 itemprop="name"><?php echo \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_ADD_ITEM_LICENCE'); ?></h2></div>
 		<?php endif; ?>
 	<div class="row">
 		<div class="col-xs-12 col-sm-7 col-md-5">
@@ -177,7 +170,7 @@ jQuery( document ).ready(function() {
 									<input type="text" class="form-control" disabled value="<?php echo $this->item->type;?>">
 								</div>
 							</div>
-                        <div class="control-group <?php echo ($this->item->type == strtolower(Text::_('COM_MULTIAGENCY_LICENCE_TYPE_ALL'))) ? 'hide':''; ?>">
+                        <div class="control-group <?php echo ($this->item->type == strtolower(\Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_LICENCE_TYPE_ALL'))) ? 'hide':''; ?>">
 								<div class="control-label">
 									<?php echo $this->form->getLabel('course_id'); ?>
 								</div>
@@ -209,7 +202,7 @@ jQuery( document ).ready(function() {
 						<?php echo $this->form->renderField('comment'); ?>
 						<!--  -->
 
-						<?php if (!Factory::getUser()->authorise('core.admin','multiagency')): ?>
+						<?php if (!\Joomla\CMS\Factory::getUser()->authorise('core.admin','multiagency')): ?>
 							<script type="text/javascript">
 								jQuery.noConflict();
 								jQuery('.tab-pane select').each(function(){
@@ -226,17 +219,17 @@ jQuery( document ).ready(function() {
 						<div class="control-group">
 							<div class="controls">
 								<?php if ($this->canSave): ?>
-									<button  type="submit" class="licenceform validate btn btn-primary" onclick="return validateLicences()"><?php echo Text::_('JSUBMIT'); ?></button>
+									<button  type="submit" class="licenceform validate btn btn-primary" onclick="return validateLicences()"><?php echo \Joomla\CMS\Language\Text::_('JSUBMIT'); ?></button>
 								<?php endif; ?>
 
-								<a class="btn btn-default" href="<?php echo Route::_('index.php?option=com_multiagency&view=licences'); ?>" title="<?php echo Text::_('JCANCEL'); ?>"><?php echo Text::_('JCANCEL'); ?></a>
+								<a class="btn btn-default" href="<?php echo \Joomla\CMS\Router\Route::_('index.php?option=com_multiagency&view=licences'); ?>" title="<?php echo \Joomla\CMS\Language\Text::_('JCANCEL'); ?>"><?php echo \Joomla\CMS\Language\Text::_('JCANCEL'); ?></a>
 							</div>
 						</div>
 
 						<input type="hidden" name="option" value="com_multiagency"/>
 						<input type="hidden" name="task" value="licenceform.save"/>
 
-						<?php echo HTMLHelper::_('form.token'); ?>
+						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('form.token'); ?>
 					</form>
 				<?php endif; ?>
 			</div>

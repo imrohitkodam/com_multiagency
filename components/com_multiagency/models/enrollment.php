@@ -148,26 +148,40 @@ class MultiagencyModelEnrollment extends ListModel
 		$query->where($db->qn('u.block') . ' = 0');
 		$query->where($db->qn('subusers.client') . " = 'com_multiagency'");
 
-		JLoader::register('TjlmsModelenrolment', JPATH_SITE . '/components/com_tjlms/models/enrolment.php');
-		$model = new TjlmsModelenrolment;
+		$enrolledUsers = array();
 
-		$licenseType = $licenseData->type;
-
-		if ($licenseType == 'all')
+		if (ComponentHelper::isEnabled('com_tjlms'))
 		{
-			$model->setState('com_tjlms' . '.filter.course_type', 1);
-			$courseIds = $this->getState('filter.selectedcourse');
-		}
-		else
-		{
-			$courseIds = $licenseData->course_id;
-		}
+			$enrolmentModelPath = JPATH_SITE . '/components/com_tjlms/models/enrolment.php';
 
-		$enrolledUsers = $model->getCourseEnrolledUsers($courseIds);
+			if (file_exists($enrolmentModelPath))
+			{
+				JLoader::register('TjlmsModelenrolment', $enrolmentModelPath);
+
+				if (class_exists('TjlmsModelenrolment'))
+				{
+					$model = new TjlmsModelenrolment;
+
+					$licenseType = $licenseData->type;
+
+					if ($licenseType == 'all')
+					{
+						$model->setState('com_tjlms' . '.filter.course_type', 1);
+						$courseIds = $this->getState('filter.selectedcourse');
+					}
+					else
+					{
+						$courseIds = $licenseData->course_id;
+					}
+
+					$enrolledUsers = $model->getCourseEnrolledUsers($courseIds);
+				}
+			}
+		}
 
 		if (!empty($enrolledUsers))
 		{
-			$query->where($db->qn('subusers.user_id') . 'NOT IN (' . implode(',', $db->q($enrolledUsers)) . ')');
+			$query->where($db->qn('subusers.user_id') . ' NOT IN (' . implode(',', $db->q($enrolledUsers)) . ')');
 		}
 
 		// Filter by search in title
@@ -272,12 +286,19 @@ class MultiagencyModelEnrollment extends ListModel
 			$licenseType = $licenseData->type;
 			$agencyId = $licenseData->multiagency_id;
 
-			JLoader::register('TjlmsCoursesHelper', JPATH_SITE . '/components/com_tjlms/helpers/courses.php');
-			$lmscourseHelper = new TjlmsCoursesHelper;
-			JLoader::register('ComtjlmsHelper', JPATH_SITE . '/components/com_tjlms/helpers/main.php');
-			$lmsmainhelper = new ComtjlmsHelper;
-			JLoader::register('TjlmsModelenrolment', JPATH_SITE . '/components/com_tjlms/models/enrolment.php');
-			$tjlmsEnrolmentModel = new TjlmsModelenrolment;
+			if (ComponentHelper::isEnabled('com_tjlms'))
+			{
+				JLoader::register('TjlmsCoursesHelper', JPATH_SITE . '/components/com_tjlms/helpers/courses.php');
+				$lmscourseHelper = new TjlmsCoursesHelper;
+				JLoader::register('ComtjlmsHelper', JPATH_SITE . '/components/com_tjlms/helpers/main.php');
+				$lmsmainhelper = new ComtjlmsHelper;
+				JLoader::register('TjlmsModelenrolment', JPATH_SITE . '/components/com_tjlms/models/enrolment.php');
+				$tjlmsEnrolmentModel = new TjlmsModelenrolment;
+			}
+			else
+			{
+				return false;
+			}
 
 			// Load agency helper file
 			$path = JPATH_SITE . '/components/com_multiagency/helpers/multiagency.php';

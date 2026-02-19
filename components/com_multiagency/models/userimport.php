@@ -97,6 +97,14 @@ class MultiagencyModelUserImport extends FormModel
 	public function saveCsvContent($fileName, $notify_user, $client_id)
 	{ 
 		$user       = Factory::getUser();
+		JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
+
+		// Load RBACL stub if com_subusers is not installed
+		if (!class_exists('RBACL'))
+		{
+			require_once JPATH_SITE . '/components/com_multiagency/helpers/rbacl_stub.php';
+		}
+
 		$addOwnUser = RBACL::authorise($user->id, 'com_multiagency', 'core.own.adduser', 'com_multiagency');
 		$addUser    = RBACL::authorise($user->id, 'com_multiagency', 'core.adduser', 'com_multiagency');
 		$phisingConsentData = $this->phisingConsent; 
@@ -196,6 +204,14 @@ class MultiagencyModelUserImport extends FormModel
 			$agencyData       = $MultiagencyModel->getData($client_id);
 			$helperObject     = new MultiagencyFrontendHelpers;
 
+			JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
+
+			// Load Cluster stub if com_cluster is not installed
+			if (!class_exists('ClusterFactory'))
+			{
+				require_once JPATH_SITE . '/components/com_multiagency/helpers/cluster_stub.php';
+			}
+
 			$ClusterModel = ClusterFactory::model('Cluster', array('ignore_request' => true));
 			$clusterData = $ClusterModel::getClusterByClient('com_multiagency', $client_id);
 
@@ -208,21 +224,27 @@ class MultiagencyModelUserImport extends FormModel
 					$contentId = "" ;
 					$jobTitle = StrToLower($eachUser['job_titles']);
 
-					BaseDatabaseModel::addIncludePath(JPATH_ROOT . '/components/com_dpe/models');
-					$schoolModel      = BaseDatabaseModel::getInstance('School', 'DpeModel');
-					$clusterJobTitles = $schoolModel->getJobTitlesByClusterId($clusterTable->id);	
-					
+					if (ComponentHelper::isEnabled('com_dpe'))
+					{
+						BaseDatabaseModel::addIncludePath(JPATH_ROOT . '/components/com_dpe/models');
+						$schoolModel      = BaseDatabaseModel::getInstance('School', 'DpeModel');
 
-					$keyOfUcmId       =  array_search($jobTitle, array_map('strtolower', array_column($clusterJobTitles, 'value')));
-					
-  	                $contentId        =  is_numeric($keyOfUcmId)?$clusterJobTitles[$keyOfUcmId]->id : null;
-					
-					// If content Id is not present the save the job title and get the content Id.
-  	                
-  	                if (!$contentId)
-  	                {  
-	  	                $contentId = $schoolModel->saveJobTitleFromCsv($clusterTable->id, $eachUser['job_titles']);
-  	                }
+						if ($schoolModel)
+						{
+							$clusterJobTitles = $schoolModel->getJobTitlesByClusterId($clusterTable->id);
+
+							$keyOfUcmId       =  array_search($jobTitle, array_map('strtolower', array_column($clusterJobTitles, 'value')));
+
+							$contentId        =  is_numeric($keyOfUcmId)?$clusterJobTitles[$keyOfUcmId]->id : null;
+
+							// If content Id is not present the save the job title and get the content Id.
+
+							if (!$contentId)
+							{
+								$contentId = $schoolModel->saveJobTitleFromCsv($clusterTable->id, $eachUser['job_titles']);
+							}
+						}
+					}
 
 				if (trim($eachUser['first_name']) == '' || trim($eachUser['email']) == '' || (!filter_var(trim($eachUser['email']), FILTER_VALIDATE_EMAIL)) )//|| empty($contentId))
 				{
@@ -287,8 +309,8 @@ class MultiagencyModelUserImport extends FormModel
 									
 										// DPE hack  If content ID present save the  jobtitle details in xref Table
 
-										if ($contentId)
-										{   
+										if ($contentId && ComponentHelper::isEnabled('com_dpe') && isset($schoolModel) && $schoolModel)
+										{
 											$schoolModel->saveJobTitle($clusterTable->id, $userobj->id, $contentId);
 										}
 

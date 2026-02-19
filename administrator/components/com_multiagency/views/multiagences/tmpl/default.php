@@ -18,7 +18,7 @@ use Joomla\CMS\Language\Text;
 HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_multiagency/helpers/');
 HTMLHelper::_('bootstrap.tooltip');
 HTMLHelper::_('behavior.multiselect');
-HTMLHelper::_('formbehavior.chosen', 'select');
+
 
 // Import CSS
 $document = Factory::getDocument();

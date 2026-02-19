@@ -171,6 +171,12 @@ class MultiagencyModelUsers extends ListModel
 		$params = ComponentHelper::getParams('com_multiagency');
 
 		JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
+
+		// Load RBACL stub if com_subusers is not installed
+		if (!class_exists('RBACL'))
+		{
+			require_once JPATH_SITE . '/components/com_multiagency/helpers/rbacl_stub.php';
+		}
 		$adminRoleId    = $params->get('multyagency_admin_role_id', '0', 'INT');
 		$orgAdminRoleId = $params->get('school_admin_role_id', '0', 'INT');
 		$trusteeRoleId  = (int) $params->get('organization_trustee_role_id');
@@ -221,24 +227,43 @@ class MultiagencyModelUsers extends ListModel
 
 		$query = $db->getQuery(true);
 
+		$selectColumns = 'DISTINCT a.*';
+
+		if (ComponentHelper::isEnabled('com_subusers'))
+		{
+			$selectColumns .= ', b.id AS su_id, c.id AS client_id, c.title, b.created_by, r.name as role_title, r.id as roleId, cluster.id as clusterId, job.dpelead as dpelead' . $jobtitleQuery;
+		}
+		else
+		{
+			$selectColumns .= ', 0 AS su_id, 0 AS client_id, "" AS title, 0 AS created_by, "" as role_title, 0 as roleId, 0 as clusterId, 0 as dpelead';
+		}
+
 		// Select the required fields from the table.
 		$query
 			->select(
 				$this->getState(
-					'list.select', 'DISTINCT a.*,b.id AS su_id, c.id AS client_id, c.title, b.created_by,r.name as role_title,r.id as roleId,cluster.id as clusterId, job.dpelead as dpelead'.$jobtitleQuery
+					'list.select', $selectColumns
 				)
 			);
 
 		$query->from($db->qn('#__users', 'a'));
 
-		$query->join('INNER', $db->qn('#__tjsu_users', 'b') .
-		' ON (' . $db->qn('a.id') . ' = ' . $db->qn('b.user_id') . ' AND ' . $db->qn('b.client') . ' = "com_multiagency" )');
+		if (ComponentHelper::isEnabled('com_subusers'))
+		{
+			$query->join('INNER', $db->qn('#__tjsu_users', 'b') .
+			' ON (' . $db->qn('a.id') . ' = ' . $db->qn('b.user_id') . ' AND ' . $db->qn('b.client') . ' = "com_multiagency" )');
 
-		$query->join('INNER', $db->qn('#__tjmultiagency_multiagency', 'c') . ' ON (' . $db->qn('b.client_id') . ' = ' . $db->qn('c.id') . ')');
-		$query->join('INNER', $db->qn('#__tj_clusters', 'cluster') . ' ON (' . $db->qn('c.id') . ' = ' . $db->qn('cluster.client_id') . ')');
-		$query->join('INNER', $db->qn('#__tjsu_roles', 'r') .
-		' ON (' . $db->qn('r.id') . ' = ' . $db->qn('b.role_id') . ' AND ' . $db->qn('r.state') . ' = 1 )');
-		$query->leftJoin($db->quoteName('#__job_title_user_xref', 'job') . ' ON (' . $db->quoteName('job.user_id') . ' = ' . $db->quoteName('b.user_id') . ' AND ' . $db->quoteName('cluster.id') . ' = ' . $db->quoteName('job.cluster_id') .')');
+			$query->join('INNER', $db->qn('#__tjmultiagency_multiagency', 'c') . ' ON (' . $db->qn('b.client_id') . ' = ' . $db->qn('c.id') . ')');
+			$query->join('INNER', $db->qn('#__tj_clusters', 'cluster') . ' ON (' . $db->qn('c.id') . ' = ' . $db->qn('cluster.client_id') . ')');
+			$query->join('INNER', $db->qn('#__tjsu_roles', 'r') .
+			' ON (' . $db->qn('r.id') . ' = ' . $db->qn('b.role_id') . ' AND ' . $db->qn('r.state') . ' = 1 )');
+			$query->leftJoin($db->quoteName('#__job_title_user_xref', 'job') . ' ON (' . $db->quoteName('job.user_id') . ' = ' . $db->quoteName('b.user_id') . ' AND ' . $db->quoteName('cluster.id') . ' = ' . $db->quoteName('job.cluster_id') .')');
+		}
+		else
+		{
+			// Fallback to something that doesn't fail
+			$query->where('1=0');
+		}
 
 
 		// if ($jobTitleFieldId)
@@ -273,6 +298,15 @@ class MultiagencyModelUsers extends ListModel
 		// Load clusters
 
 		$clusterIds       = array();
+
+		JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
+
+		// Load Cluster stub if com_cluster is not installed
+		if (!class_exists('ClusterFactory'))
+		{
+			require_once JPATH_SITE . '/components/com_multiagency/helpers/cluster_stub.php';
+		}
+
 		$clusterUserModel = ClusterFactory::model('ClusterUser', array('ignore_request' => true));
 		$clusterList      = $clusterUserModel->getUsersClusters($user->id);
 
@@ -344,65 +378,68 @@ class MultiagencyModelUsers extends ListModel
 			
 			// Dpe Hack end		
 		
-		if (!empty($agencies) && in_array($agencies, $allocatedAgency))
+		if (ComponentHelper::isEnabled('com_subusers'))
 		{
-			if (is_array($agencies))
+			if (!empty($agencies) && in_array($agencies, $allocatedAgency))
 			{
-				$query->where('cluster.id IN (' .  implode(',', $agencies) . ')');
-			}
-			else
-			{
-				$query->where('cluster.id = ' . (INT) $agencies);
-			}
-
-			if (!$user->authorise('core.manageall', 'com_cluster'))
-			{
-				$userFormModel = BaseDatabaseModel::getInstance('UserForm', 'MultiagencyModel', array('ignore_request' => true));
-
-				$roles = $userFormModel->getUserAgencyRole((int) $agencyId);
-
-				if (!empty($roles))
+				if (is_array($agencies))
 				{
-					$allowRoles = array_column($roles, 'role_id');
+					$query->where('cluster.id IN (' .  implode(',', $agencies) . ')');
+				}
+				else
+				{
+					$query->where('cluster.id = ' . (INT) $agencies);
+				}
 
-					// Manager can see Admin in list but cant edit them
+				if (!$user->authorise('core.manageall', 'com_cluster'))
+				{
+					$userFormModel = BaseDatabaseModel::getInstance('UserForm', 'MultiagencyModel', array('ignore_request' => true));
 
-					// Commented, needed for ref $query->where("b.role_id  IN ('" . implode("','", $allowRoles) . "')");
+					$roles = $userFormModel->getUserAgencyRole((int) $agencyId);
 
-					// Dont show Trustee Users other than who have access to all cluster
-
-					/*
-					if ($trusteeRoleId && !in_array($orgAdminRoleId, $allowRoles))
+					if (!empty($roles))
 					{
-						$query->where($db->quoteName('b.role_id') . ' != ' . $db->quote((int) $trusteeRoleId));
+						$allowRoles = array_column($roles, 'role_id');
+
+						// Manager can see Admin in list but cant edit them
+
+						// Commented, needed for ref $query->where("b.role_id  IN ('" . implode("','", $allowRoles) . "')");
+
+						// Dont show Trustee Users other than who have access to all cluster
+
+						/*
+						if ($trusteeRoleId && !in_array($orgAdminRoleId, $allowRoles))
+						{
+							$query->where($db->quoteName('b.role_id') . ' != ' . $db->quote((int) $trusteeRoleId));
+						}
+						*/
 					}
-					*/
 				}
 			}
-		}
-		elseif (!empty($agencies) && (int) $agencies && $user->authorise('core.manageall', 'com_cluster'))
-		{
-
-			if (is_array($agencies))
+			elseif (!empty($agencies) && (int) $agencies && $user->authorise('core.manageall', 'com_cluster'))
 			{
-				$query->where('cluster.id IN ( ' . implode(",", $agencies) .')');
+
+				if (is_array($agencies))
+				{
+					$query->where('cluster.id IN ( ' . implode(",", $agencies) .')');
+				}
+				else
+				{
+					$query->where('cluster.id = ' . (INT) $agencies );
+				}
+				
 			}
 			else
 			{
-				$query->where('cluster.id = ' . (INT) $agencies );
+				$query->where("cluster.id  IN ('" . implode("','", $allocatedAgency) . "')");
 			}
-			
-		}
-		else
-		{
-			$query->where("cluster.id  IN ('" . implode("','", $allocatedAgency) . "')");
-		}
 
-		$roleId = $this->getState('filter.role_id');
+			$roleId = $this->getState('filter.role_id');
 
-		if (!empty($roleId))
-		{
-			$query->where($db->qn('b.role_id') . ' = ' . (int) $roleId);
+			if (!empty($roleId))
+			{
+				$query->where($db->qn('b.role_id') . ' = ' . (int) $roleId);
+			}
 		}
 
 		if (!empty($search))
@@ -416,7 +453,7 @@ class MultiagencyModelUsers extends ListModel
 				$search = $db->quote('%' . $db->escape(substr($search, 9), true) . '%');
 				$query->where('a.username LIKE ' . $search);
 			}
-			elseif (stripos($search, 'title:') === 0)
+			elseif (stripos($search, 'title:') === 0 && ComponentHelper::isEnabled('com_subusers'))
 			{
 				$search = $db->quote('%' . $db->escape(substr($search, 9), true) . '%');
 				$query->where('c.title LIKE ' . $search);
@@ -431,7 +468,11 @@ class MultiagencyModelUsers extends ListModel
 				$searches[] = 'a.name LIKE ' . $search;
 				$searches[] = 'a.username LIKE ' . $search;
 				$searches[] = 'a.email LIKE ' . $search;
-				$searches[] = 'c.title LIKE ' . $search;
+				
+				if (ComponentHelper::isEnabled('com_subusers'))
+				{
+					$searches[] = 'c.title LIKE ' . $search;
+				}
 
 				// Add the clauses to the query.
 				$query->where('(' . implode(' OR ', $searches) . ')');
@@ -440,7 +481,7 @@ class MultiagencyModelUsers extends ListModel
 
 		// DPE  hack for dpe lead 
 
-		if ($this->getState('filter.dpelead') == 'dpelead')
+		if ($this->getState('filter.dpelead') == 'dpelead' && ComponentHelper::isEnabled('com_subusers'))
 		{
 			$query->where($db->qn('job.dpelead') . ' = 1 AND ' .$db->qn('b.role_id') .' = '. $orgAdminRoleId );
 		}
@@ -449,7 +490,7 @@ class MultiagencyModelUsers extends ListModel
 		// SLA Filter
 		$slaFilter = $this->getState('filter.sla_filter');
 
-		if ($slaFilter && in_array($slaFilter, ['active', 'inactive']))
+		if ($slaFilter && in_array($slaFilter, ['active', 'inactive']) && ComponentHelper::isEnabled('com_subusers'))
 		{
 			$currentDate = Factory::getDate('now', 'UTC')->toSql();
 
@@ -558,16 +599,20 @@ class MultiagencyModelUsers extends ListModel
 		$items = parent::getItems();
 		$params = ComponentHelper::getParams('com_multiagency');
 
-		BaseDatabaseModel::addIncludePath(JPATH_ROOT . '/components/com_dpe/models');
-		$userModel = BaseDatabaseModel::getInstance('Users', 'DpeModel');
-		// Get JOB Title
-
-		foreach($items as $key => $item)
+		if (ComponentHelper::isEnabled('com_dpe'))
 		{
+			BaseDatabaseModel::addIncludePath(JPATH_ROOT . '/components/com_dpe/models');
+			$userModel = BaseDatabaseModel::getInstance('Users', 'DpeModel');
 
-			$jobtitle = $userModel->getJobTitle($item->id, $item->clusterId);
-			$items[$key]->jobtitle = $jobtitle[0];
-		}	
+			if ($userModel)
+			{
+				foreach ($items as $key => $item)
+				{
+					$jobtitle = $userModel->getJobTitle($item->id, $item->clusterId);
+					$items[$key]->jobtitle = isset($jobtitle[0]) ? $jobtitle[0] : '';
+				}
+			}
+		}
 
 		return $items;
 	}

@@ -117,7 +117,7 @@ class MultiagencyModelUserForm extends FormModel
 
 				// Convert the JTable to a clean JObject.
 				$properties  = $table->getProperties(1);
-				$this->item = ArrayHelper::toObject($properties, 'JObject');
+				$this->item = ArrayHelper::toObject($properties, \stdClass::class);
 			}
 		}
 
@@ -248,7 +248,7 @@ class MultiagencyModelUserForm extends FormModel
 		$allowedAgency = array();
 
 		// Get com_subusers component status
-		if (ComponentHelper::getComponent('com_subusers', true)->enabled)
+		if (ComponentHelper::isEnabled('com_subusers'))
 		{
 			BaseDatabaseModel::addIncludePath(JPATH_SITE . '/components/com_multiagency/models');
 			$MultiagencyModel = BaseDatabaseModel::getInstance('Multiagency', 'MultiagencyModel', array('ignore_request' => true));
@@ -293,7 +293,7 @@ class MultiagencyModelUserForm extends FormModel
 			$helperObject = new MultiagencyFrontendHelpers;
 
 			// Get com_cluster component status
-			if (ComponentHelper::getComponent('com_cluster', true)->enabled)
+			if (ComponentHelper::isEnabled('com_cluster'))
 			{
 				$subFormArray = array();
 
@@ -749,7 +749,7 @@ class MultiagencyModelUserForm extends FormModel
 			// Code End - to add entries into com_cluster and com_subusers extension tables. Also, assign user group
 
 			// Send emails as per data update
-			if (ComponentHelper::getComponent('com_tjnotifications', true)->enabled)
+			if (ComponentHelper::isEnabled('com_tjnotifications'))
 			{
 				if (!$userexist)
 				{
@@ -1015,6 +1015,12 @@ class MultiagencyModelUserForm extends FormModel
 		}
 
 		JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
+
+		// Load RBACL stub if com_subusers is not installed
+		if (!class_exists('RBACL'))
+		{
+			require_once JPATH_SITE . '/components/com_multiagency/helpers/rbacl_stub.php';
+		}
 		$roles = RBACL::getRoleByUser($user->id, 'com_multiagency');
 
 		// Get related roles and Trustee can not have more than one core role
@@ -1254,7 +1260,7 @@ class MultiagencyModelUserForm extends FormModel
 			$userId = Factory::getUser()->id;
 		}
 
-		if (ComponentHelper::getComponent('com_subusers', true)->enabled)
+		if (ComponentHelper::isEnabled('com_subusers'))
 		{
 			if (!class_exists('MultiagencyFrontendHelpers'))
 			{
@@ -1316,7 +1322,7 @@ class MultiagencyModelUserForm extends FormModel
 		$layout = $app->getInput()->get('layout');
 		$user   = Factory::getUser();
 
-		if (ComponentHelper::getComponent('com_subusers', true)->enabled)
+		if (ComponentHelper::isEnabled('com_subusers'))
 		{
 			if (!$user->authorise('core.manageall', 'com_cluster'))
 			{

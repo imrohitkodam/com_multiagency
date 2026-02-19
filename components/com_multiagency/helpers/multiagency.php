@@ -345,7 +345,7 @@ class MultiagencyFrontendHelpers
 		$replacements->user->siteurl = \Joomla\CMS\Uri\Uri::root();
 
 		// Get com_tjnotifications component status
-		if (ComponentHelper::getComponent('com_tjnotifications', true)->enabled)
+		if (ComponentHelper::isEnabled('com_tjnotifications'))
 		{
 			$res = Tjnotifications::send("com_multiagency", $key, $recipients, $replacements, $options);
 		}
@@ -427,7 +427,7 @@ class MultiagencyFrontendHelpers
 	 */
 	public function getAgencyEnrollment($multiagencyId, $byCourseEnrollment = false)
 	{
-		if ($multiagencyId)
+		if ($multiagencyId && ComponentHelper::isEnabled('com_subusers') && ComponentHelper::isEnabled('com_tjlms'))
 		{
 			// Create a new query object
 			$db = Factory::getDbo();
@@ -457,7 +457,7 @@ class MultiagencyFrontendHelpers
 			return $results;
 		}
 
-		return 0;
+		return array();
 	}
 
 	/**
@@ -474,7 +474,7 @@ class MultiagencyFrontendHelpers
 	 */
 	public function getRoleClient($userId, $client = 'com_multiagency', $contentId = null, $state = 0)
 	{
-		if ($userId)
+		if ($userId && ComponentHelper::isEnabled('com_subusers'))
 		{
 			$db = Factory::getDbo();
 			$query = $db->getQuery(true);
@@ -529,7 +529,7 @@ class MultiagencyFrontendHelpers
 	 */
 	public function getIdsUserAgencyRoleMap($userId, $roleid, $clientId = null, $client = 'com_multiagency')
 	{
-		if ($userId)
+		if ($userId && ComponentHelper::isEnabled('com_subusers'))
 		{
 			$db        = Factory::getDbo();
 			$query     = $db->getQuery(true);

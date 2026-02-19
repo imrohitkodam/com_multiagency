@@ -80,6 +80,12 @@ class MultiagencyViewMultiagencyform extends HtmlView
 				// Check cluster id and check cluster access
 				JLoader::import("/components/com_cluster/libraries/cluster", JPATH_ADMINISTRATOR);
 
+				// Load Cluster stub if com_cluster is not installed
+				if (!class_exists('ClusterFactory'))
+				{
+					require_once JPATH_SITE . '/components/com_multiagency/helpers/cluster_stub.php';
+				}
+
 				$clusterId = $input->get('clusterId', 0);
 				$clustertable = ClusterFactory::table('Clusters');
 				$clustertable->load(array('id' => $clusterId));
@@ -117,21 +123,31 @@ class MultiagencyViewMultiagencyform extends HtmlView
 
 		$path = JPATH_SITE . '/components/com_tjfields/helpers/geo.php';
 
-		if (!class_exists('tmtTestsHelper'))
+		if (file_exists($path))
 		{
-			// Require_once $path
-			JLoader::register('TjGeoHelper', $path);
-			JLoader::load('TjGeoHelper');
+			if (!class_exists('TjGeoHelper'))
+			{
+				JLoader::register('TjGeoHelper', $path);
+				JLoader::load('TjGeoHelper');
+			}
+
+			if (class_exists('TjGeoHelper'))
+			{
+				$tjGeoHelper = TjGeoHelper::getInstance('TjGeoHelper');
+
+				// Get country list
+				$defaultCountry = array();
+				$defaultCountry['id'] = '';
+				$defaultCountry['country'] = Text::_('COM_MULTIAGENCY_SELECT_COUNTRY');
+				$this->countryList = (array) $tjGeoHelper->getCountryList();
+				$this->countryList = array_merge(array($defaultCountry), $this->countryList);
+			}
 		}
 
-		$tjGeoHelper = TjGeoHelper::getInstance('TjGeoHelper');
-
-		// Get country list
-		$defaultCountry = array();
-		$defaultCountry['id'] = '';
-		$defaultCountry['country'] = Text::_('COM_MULTIAGENCY_SELECT_COUNTRY');
-		$this->countryList = (array) $tjGeoHelper->getCountryList();
-		$this->countryList = array_merge(array($defaultCountry), $this->countryList);
+		if (empty($this->countryList))
+		{
+			$this->countryList = array();
+		}
 
 		// Get manager list
 		$defaultManager = array();

@@ -10,35 +10,31 @@
 
 // no direct access
 defined('_JEXEC') or die;
-use Joomla\CMS\Uri\Uri;
 
-use Joomla\CMS\Factory;
-use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\Form\FormHelper;
 
-HTMLHelper::script('media/com_multiagency/js/user.min.js');
-HTMLHelper::_('behavior.multiselect');
-HTMLHelper::_('formbehavior.chosen', 'select');
 
-Text::script('COM_MULTIAGENCY_INTERACTION_AJAX_ERROR');
+\Joomla\CMS\HTML\HTMLHelper::script('media/com_multiagency/js/user.min.js');
+\Joomla\CMS\HTML\HTMLHelper::_('behavior.multiselect');
 
-$jinput = Factory::getApplication()->getInput();
+
+\Joomla\CMS\Language\Text::script('COM_MULTIAGENCY_INTERACTION_AJAX_ERROR');
+
+$jinput = \Joomla\CMS\Factory::getApplication()->getInput();
 $view = $jinput->get('view', '', 'string');
 
 if ($view == 'users')
 {
-	$filepath = Uri::root() . 'media/com_multiagency/csv/SampleFormat.csv';
+	$filepath = \Joomla\CMS\Uri\Uri::root() . 'media/com_multiagency/csv/SampleFormat.csv';
 }
 else
 {
-	$filepath = Uri::root() . 'media/com_multiagency/csv/SampleFormat.csv';
+	$filepath = \Joomla\CMS\Uri\Uri::root() . 'media/com_multiagency/csv/SampleFormat.csv';
 }
 
-Text::script('COM_MULTIAGENCY_FORM_DESC_SELECT_AGENCY_ID');
+\Joomla\CMS\Language\Text::script('COM_MULTIAGENCY_FORM_DESC_SELECT_AGENCY_ID');
 
-FormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_multiagency/models/fields/');
-$agencies = FormHelper::loadFieldType('agency', false);
+\Joomla\CMS\Form\FormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_multiagency/models/fields/');
+$agencies = \Joomla\CMS\Form\FormHelper::loadFieldType('agency', false);
 $agencyList = $agencies->getOptionsExternally();
 
 ?>
@@ -46,24 +42,24 @@ $agencyList = $agencies->getOptionsExternally();
 <div id="tjlms_import-csv" class="tjlms-wrapper row-fluid staff-import">
 	<div id="import" class="form-horizontal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
 		<div class="modal-header">
-			<h3 id="myModalLabel"><?php echo Text::_("COM_MULTIAGENCY_ENROLLMENT_CSV_UPLOAD_FILE"); ?></h3>
+			<h3 id="myModalLabel"><?php echo \Joomla\CMS\Language\Text::_("COM_MULTIAGENCY_ENROLLMENT_CSV_UPLOAD_FILE"); ?></h3>
 		</div>
 		<div class="modal-body">
 			<div class="control-group csv-import-user-select">
 				<div class="control-label mb-10 staff_notify_user_import">
 					<input id="notify_user_import" type="checkbox" name="notify_user_import" checked="checked">
-					<?php echo Text::_('COM_MULTIAGENCY_NOTIFY_ASSIGN_USER'); ?>
+					<?php echo \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_NOTIFY_ASSIGN_USER'); ?>
 				</div>
 				<div class="control-group tjlmscenter">
 					<select name="client_id" class="inputbox selectAgency" id="agency">
-						<?php echo HTMLHelper::_('select.options', $agencyList, 'value', 'text', ''); ?>
+						<?php echo \Joomla\CMS\HTML\HTMLHelper::_('select.options', $agencyList, 'value', 'text', ''); ?>
 					</select>
 				</div>
 				<div class="" id="license_error">
 				</div>
 			</div>
 
-			<div class="control-label tjlmscenter"><?php echo Text::_("COM_MULTIAGENCY_ENROLLMENT_CSV_SELECT_FILE"); ?></div>
+			<div class="control-label tjlmscenter"><?php echo \Joomla\CMS\Language\Text::_("COM_MULTIAGENCY_ENROLLMENT_CSV_SELECT_FILE"); ?></div>
 			<div class="controls">
 				<div class="custom-file">
 					<input type="file" class="custom-file-input" id="tjlms-csv-upload" name="question-csv-upload" aria-describedby="inputGroupFileAddon01">
@@ -76,15 +72,15 @@ $agencyList = $agencies->getOptionsExternally();
 			<div id="infoText"></div>
 			<div>
 				<a id="downloadCSVLog" target="_blank" href="#" download style="display:none">
-					<?php echo Text::_("COM_MULTIAGENCY_DOWNLOAD_LOGS"); ?>
+					<?php echo \Joomla\CMS\Language\Text::_("COM_MULTIAGENCY_DOWNLOAD_LOGS"); ?>
 				</a>
 			</div>
 
 			<hr class="hr hr-condensed">
 			<div class="help-block center alert alert-warning">
 				<?php
-				$link = '<a href="' . $filepath . '">' . Text::_("COM_MULTIAGENCY_ENROLLMENT_CSV_SAMPLE") . '</a>';
-				echo Text::sprintf('COM_MULTIAGENCY_ENROLLMENT_CSVHELP', $link);
+				$link = '<a href="' . $filepath . '">' . \Joomla\CMS\Language\Text::_("COM_MULTIAGENCY_ENROLLMENT_CSV_SAMPLE") . '</a>';
+				echo \Joomla\CMS\Language\Text::sprintf('COM_MULTIAGENCY_ENROLLMENT_CSVHELP', $link);
 				?>
 			</div>
 
@@ -93,8 +89,8 @@ $agencyList = $agencies->getOptionsExternally();
 </div>
 
 <?php
-HTMLHelper::script('media/com_multiagency/assets/vendor/resumable.js');
-HTMLHelper::script('media/com_multiagency/dist/app.min.js');
+\Joomla\CMS\HTML\HTMLHelper::script('media/com_multiagency/assets/vendor/resumable.js');
+\Joomla\CMS\HTML\HTMLHelper::script('media/com_multiagency/dist/app.min.js');
 ?>
 <style>
 	input[type=file] {

@@ -16,14 +16,14 @@ use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Language\Text;
 
-Joomla\CMS\Form\FormHelper::loadFieldClass('list');
+use Joomla\CMS\Form\Field\ListField;
 
 /**
  * Supports an HTML select list of allocated agencies
  *
  * @since  __DEPLOY_VERSION__
  */
-class JFormFieldLicenses extends JFormFieldList
+class JFormFieldLicenses extends ListField
 {
 	/**
 	 * The form field type.

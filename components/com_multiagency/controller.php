@@ -57,7 +57,7 @@ class MultiagencyController extends BaseController
 		$db = Factory::getDbo();
 		$query = $db->getQuery(true);
 
-		$query = 'UPDATE z467w_hierarchy_users SET reports_to = user_id, user_id = subuser_id, created_by = subuser_id,
+		$query = 'UPDATE #__hierarchy_users SET reports_to = user_id, user_id = subuser_id, created_by = subuser_id,
 		modified_by =subuser_id where reports_to = 0';
 		$db->setQuery($query);
 

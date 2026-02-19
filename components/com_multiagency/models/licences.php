@@ -18,6 +18,13 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Component\ComponentHelper;
 
+\JLoader::import('components.com_subusers.includes.rbacl', JPATH_ADMINISTRATOR);
+
+if (!class_exists('RBACL'))
+{
+	require_once JPATH_SITE . '/components/com_multiagency/helpers/rbacl_stub.php';
+}
+
 /**
  * Methods supporting a list of Multiagency records.
  *
@@ -157,7 +164,7 @@ class MultiagencyModelLicences extends ListModel
 		$manager_id = $app->getUserState('user_id');
 
 		// Get com_tjlms component status
-		if (ComponentHelper::getComponent('com_tjlms', true)->enabled)
+		if (ComponentHelper::isEnabled('com_tjlms'))
 		{
 			$cour_id = $app->getUserState('course_id');
 			$query->select('course.title');
@@ -204,14 +211,20 @@ class MultiagencyModelLicences extends ListModel
 			else
 			{
 				$search = $db->Quote('%' . $db->escape($search, true) . '%');
-				$query->where('(' . $db->quoteName('a.total_seats') . ' LIKE '
+				$where = '(' . $db->quoteName('a.total_seats') . ' LIKE '
 									. $search . 'OR'
 									. $db->quoteName('a.used_seats') . ' LIKE '
 									. $search . 'OR'
 									. $db->quoteName('multiagency.title') . ' LIKE '
-									. $search . 'OR'
-									. $db->quoteName('course.title') . ' LIKE '
-									. $search . ')');
+									. $search;
+				
+				if (ComponentHelper::isEnabled('com_tjlms'))
+				{
+					$where .= 'OR' . $db->quoteName('course.title') . ' LIKE ' . $search;
+				}
+
+				$where .= ')';
+				$query->where($where);
 			}
 		}
 

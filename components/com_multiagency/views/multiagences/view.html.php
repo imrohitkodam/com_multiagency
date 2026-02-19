@@ -89,14 +89,19 @@ class MultiagencyViewMultiagences extends HtmlView
 
 		$path = JPATH_SITE . '/components/com_tjfields/helpers/geo.php';
 
-		if (!class_exists('tmtTestsHelper'))
+		if (file_exists($path))
 		{
-			// Require_once $path
-			JLoader::register('TjGeoHelper', $path);
-			JLoader::load('TjGeoHelper');
-		}
+			if (!class_exists('TjGeoHelper'))
+			{
+				JLoader::register('TjGeoHelper', $path);
+				JLoader::load('TjGeoHelper');
+			}
 
-		$this->tjGeoHelper = TjGeoHelper::getInstance('TjGeoHelper');
+			if (class_exists('TjGeoHelper'))
+			{
+				$this->tjGeoHelper = TjGeoHelper::getInstance('TjGeoHelper');
+			}
+		}
 
 		// Check for errors.
 		if (count($errors = $this->get('Errors')))

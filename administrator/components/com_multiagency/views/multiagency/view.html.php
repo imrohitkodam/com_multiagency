@@ -45,28 +45,43 @@ class MultiagencyViewMultiagency extends HtmlView
 
 		$path = JPATH_SITE . '/components/com_tjfields/helpers/geo.php';
 
-		if (!class_exists('tmtTestsHelper'))
+		if (file_exists($path))
 		{
-			// Require_once $path
-			JLoader::register('TjGeoHelper', $path);
-			JLoader::load('TjGeoHelper');
+			if (!class_exists('TjGeoHelper'))
+			{
+				JLoader::register('TjGeoHelper', $path);
+				JLoader::load('TjGeoHelper');
+			}
+
+			if (class_exists('TjGeoHelper'))
+			{
+				$tjGeoHelper = TjGeoHelper::getInstance('TjGeoHelper');
+
+				// Get country list
+				$defaultCountry = array();
+				$defaultCountry['id'] = '';
+				$defaultCountry['country'] = Text::_('COM_MULTIAGENCY_SELECT_COUNTRY');
+				$this->countryList = (array) $tjGeoHelper->getCountryList();
+				$this->countryList = array_merge(array($defaultCountry), $this->countryList);
+
+				// Get state list
+				$defaultState = array();
+				$defaultState['id'] = '';
+				$defaultState['region'] = Text::_('COM_MULTIAGENCY_SELECT_REGION');
+				$this->stateList = (array) $tjGeoHelper->getRegionList($this->item->country_id);
+				$this->stateList = array_merge(array($defaultState), $this->stateList);
+			}
 		}
 
-		$tjGeoHelper = TjGeoHelper::getInstance('TjGeoHelper');
+		if (empty($this->countryList))
+		{
+			$this->countryList = array();
+		}
 
-		// Get country list
-		$defaultCountry = array();
-		$defaultCountry['id'] = '';
-		$defaultCountry['country'] = Text::_('COM_MULTIAGENCY_SELECT_COUNTRY');
-		$this->countryList = (array) $tjGeoHelper->getCountryList();
-		$this->countryList = array_merge(array($defaultCountry), $this->countryList);
-
-		// Get state list
-		$defaultState = array();
-		$defaultState['id'] = '';
-		$defaultState['region'] = Text::_('COM_MULTIAGENCY_SELECT_REGION');
-		$this->stateList = (array) $tjGeoHelper->getRegionList($this->item->country_id);
-		$this->stateList = array_merge(array($defaultState), $this->stateList);
+		if (empty($this->stateList))
+		{
+			$this->stateList = array();
+		}
 
 		// Get manager list
 		$defaultManager = array();

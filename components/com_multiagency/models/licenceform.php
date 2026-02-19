@@ -141,7 +141,7 @@ class MultiagencyModelLicenceForm extends FormModel
 
 				// Convert the JTable to a clean JObject.
 				$properties  = $table->getProperties(1);
-				$this->item = ArrayHelper::toObject($properties, 'JObject');
+				$this->item = ArrayHelper::toObject($properties, \stdClass::class);
 			}
 		}
 
@@ -708,7 +708,7 @@ class MultiagencyModelLicenceForm extends FormModel
 
 			// Convert the JTable to a clean JObject.
 			$properties  = $table->getProperties(1);
-			$this->item = ArrayHelper::toObject($properties, 'JObject');
+			$this->item = ArrayHelper::toObject($properties, \stdClass::class);
 
 			// Get saved licence tool clients
 			$licenceModel = Multiagency::model('licence', array('ignore_request' => true));

@@ -9,12 +9,10 @@
  */
 
 defined('_JEXEC') or die;
-use Joomla\CMS\Language\Text;
 use Joomla\CMS\Factory;
-use Joomla\CMS\Router\Route;
 
 // No direct access
-JLoader::register('FieldsHelper', JPATH_ADMINISTRATOR . '/components/com_fields/helpers/fields.php');
+\JLoader::register('FieldsHelper', JPATH_ADMINISTRATOR . '/components/com_fields/helpers/fields.php');
 
 $fieldsToShow = $this->params->get('agency_details_fields');
 

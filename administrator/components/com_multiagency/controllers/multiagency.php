@@ -43,11 +43,24 @@ class MultiagencyControllerMultiagency extends FormController
 	{
 		$path = JPATH_SITE . '/components/com_tjfields/helpers/geo.php';
 
-		if (!class_exists('tmtTestsHelper'))
+		if (!file_exists($path))
 		{
-			// Require_once $path
+			echo '[]';
+			Factory::getApplication()->close();
+			return;
+		}
+
+		if (!class_exists('TjGeoHelper'))
+		{
 			JLoader::register('TjGeoHelper', $path);
 			JLoader::load('TjGeoHelper');
+		}
+
+		if (!class_exists('TjGeoHelper'))
+		{
+			echo '[]';
+			Factory::getApplication()->close();
+			return;
 		}
 
 		$tjGeoHelper = TjGeoHelper::getInstance('TjGeoHelper');

@@ -18,7 +18,7 @@ use Joomla\CMS\Router\Route;
 HTMLHelper::addIncludePath(JPATH_ADMINISTRATOR . '/components/com_multiagency/helpers/html');
 HTMLHelper::_('bootstrap.tooltip');
 HTMLHelper::_('behavior.formvalidator');
-HTMLHelper::_('formbehavior.chosen', 'select');
+
 HTMLHelper::_('behavior.keepalive');
 
 // Import CSS

@@ -8,47 +8,41 @@
  */
 // No direct access
 defined('_JEXEC') or die;
-use Joomla\CMS\Uri\Uri;
-use Joomla\CMS\Layout\LayoutHelper;
 
-use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Factory;
-use Joomla\CMS\Language\Text;
-use Joomla\CMS\Router\Route;
 
-HTMLHelper::_('behavior.keepalive');
-HTMLHelper::_('bootstrap.tooltip');
-HTMLHelper::_('behavior.formvalidator');
-HTMLHelper::_('formbehavior.chosen', 'select');
-HTMLHelper::_('behavior.modal');
+\Joomla\CMS\HTML\HTMLHelper::_('behavior.keepalive');
+\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+\Joomla\CMS\HTML\HTMLHelper::_('behavior.formvalidator');
+
+// \Joomla\CMS\HTML\HTMLHelper::_('behavior.modal');
 
 // Load admin language file
-$lang = Factory::getLanguage();
+$lang = \Joomla\CMS\Factory::getLanguage();
 $lang->load('com_multiagency', JPATH_SITE);
-$user    = Factory::getUser();
-$JUriRoot = Uri::root();
+$user    = \Joomla\CMS\Factory::getUser();
+$JUriRoot = \Joomla\CMS\Uri\Uri::root();
 
 $canEdit    = $user->authorise('core.edit', 'com_multiagency');
-Text::script('COM_MULTIAGENCY_DUPLICATE_MANAGER');
-HTMLHelper::script( Uri::root().'media/com_multiagency/js/multiagency.js' );
+\Joomla\CMS\Language\Text::script('COM_MULTIAGENCY_DUPLICATE_MANAGER');
+\Joomla\CMS\HTML\HTMLHelper::script( \Joomla\CMS\Uri\Uri::root().'media/com_multiagency/js/multiagency.js' );
 
 ?>
 <div class="multiagency-edit front-end-edit">
 	<div class="page-header">
 	<?php if (!$canEdit) : ?>
 		<h2>
-			<?php throw new Exception(Text::_('COM_MULTIAGENCY_ERROR_MESSAGE_NOT_AUTHORISED'), 403); ?>
+			<?php throw new Exception(\Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_ERROR_MESSAGE_NOT_AUTHORISED'), 403); ?>
 		</h2>
 	<?php else : ?>
 	<?php if (!empty($this->item->id)): ?>
-	<h2><?php echo Text::sprintf('COM_MULTIAGENCY_EDIT_ITEM_TITLE', Text::_('COM_MULTIAGENCY_ORGANISATION')); ?></h2>
+	<h2><?php echo \Joomla\CMS\Language\Text::sprintf('COM_MULTIAGENCY_EDIT_ITEM_TITLE', \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_ORGANISATION')); ?></h2>
 	<?php else: ?>
-	<h2><?php echo Text::sprintf('COM_MULTIAGENCY_ADD_ITEM', Text::_('COM_MULTIAGENCY_ORGANISATION')); ?></h2>
+	<h2><?php echo \Joomla\CMS\Language\Text::sprintf('COM_MULTIAGENCY_ADD_ITEM', \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_ORGANISATION')); ?></h2>
 	<?php endif; ?>
 	</div>
 	<div class="col-xs-12 col-sm-7 col-md-7">
 		<div class="clearfix">&nbsp;</div>
-		<form id="form-multiagency" action="<?php echo Route::_('index.php?option=com_multiagency&task=multiagency.save'); ?>" method="post" class="form-validate form-horizontal dp-form-styling" enctype="multipart/form-data">
+		<form id="form-multiagency" action="<?php echo \Joomla\CMS\Router\Route::_('index.php?option=com_multiagency&task=multiagency.save'); ?>" method="post" class="form-validate form-horizontal dp-form-styling" enctype="multipart/form-data">
 			<input type="hidden" name="jform[ordering]" value="<?php echo $this->item->ordering; ?>" />
 			<input type="hidden" name="jform[state]" value="<?php echo $this->item->state; ?>" />
 			<input type="hidden" name="jform[checked_out]" value="<?php echo $this->item->checked_out; ?>" />
@@ -63,7 +57,7 @@ HTMLHelper::script( Uri::root().'media/com_multiagency/js/multiagency.js' );
 					<?php echo $this->form->getInput('title'); ?>
 				</div>
 			</div>
-			<?php echo LayoutHelper::render('joomla.edit.params', $this); ?>
+			<?php echo \Joomla\CMS\Layout\LayoutHelper::render('joomla.edit.params', $this); ?>
 			<?php echo $this->form->renderField('manager'); ?>
 			<?php echo $this->form->renderField('id'); ?>
 
@@ -72,18 +66,18 @@ HTMLHelper::script( Uri::root().'media/com_multiagency/js/multiagency.js' );
 				<div class="controls text-right">
 					<?php if ($this->canSave): ?>
 					<button type="submit" class="validate btn btn-primary" onclick="return checkDuplicates();">
-						<?php echo Text::_( 'JSUBMIT'); ?>
+						<?php echo \Joomla\CMS\Language\Text::_( 'JSUBMIT'); ?>
 					</button>
 					<?php endif; ?>
-					<a class="btn btn-default" href="<?php echo Route::_('index.php?option=com_multiagency&task=multiagences'); ?>" title="<?php echo Text::_('JCANCEL'); ?>">
-						<?php echo Text::_( 'JCANCEL'); ?>
+					<a class="btn btn-default" href="<?php echo \Joomla\CMS\Router\Route::_('index.php?option=com_multiagency&task=multiagences'); ?>" title="<?php echo \Joomla\CMS\Language\Text::_('JCANCEL'); ?>">
+						<?php echo \Joomla\CMS\Language\Text::_( 'JCANCEL'); ?>
 					</a>
 				</div>
 			</div>
 			<input type="hidden" name="option" value="com_multiagency" />
 			<input type="hidden" name="task" value="multiagencyform.save" />
-			<?php echo HTMLHelper::_( 'form.token'); ?>
-			<?php echo HTMLHelper::_( 'jquery.token'); ?>
+			<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token'); ?>
+			<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'jquery.token'); ?>
 		</form>
 	</div>
 	<?php endif; ?>

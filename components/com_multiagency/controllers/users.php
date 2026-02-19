@@ -79,6 +79,13 @@ class MultiagencyControllerUsers extends \Joomla\CMS\MVC\Controller\BaseControll
 		}
 
 		JLoader::import("/components/com_cluster/includes/cluster", JPATH_ADMINISTRATOR);
+
+		// Load Cluster stub if com_cluster is not installed
+		if (!class_exists('ClusterFactory'))
+		{
+			require_once JPATH_SITE . '/components/com_multiagency/helpers/cluster_stub.php';
+		}
+
 		$clusterUserModel = ClusterFactory::model('ClusterUser', array('ignore_request' => true));
 
 		// Check logged-in user having a remove user permission of selected user's cluster

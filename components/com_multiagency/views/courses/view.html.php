@@ -96,9 +96,20 @@ class MultiagencyViewCourses extends HtmlView
 		$this->pagination = $this->get('Pagination');
 		$this->params     = $app->getParams('com_multiagency');
 
-		require_once JPATH_SITE . '/components/com_tjlms/helpers/main.php';
-		$comtjlmsHelper = new comtjlmsHelper;
-		$this->orderItemid    = $comtjlmsHelper->getItemId('index.php?option=com_tjlms&view=enrolment');
+		$this->orderItemid = 0;
+
+		$tjlmsHelperPath = JPATH_SITE . '/components/com_tjlms/helpers/main.php';
+
+		if (ComponentHelper::isEnabled('com_tjlms') && file_exists($tjlmsHelperPath))
+		{
+			require_once $tjlmsHelperPath;
+
+			if (class_exists('comtjlmsHelper'))
+			{
+				$comtjlmsHelper = new comtjlmsHelper;
+				$this->orderItemid = $comtjlmsHelper->getItemId('index.php?option=com_tjlms&view=enrolment');
+			}
+		}
 
 		$this->user = Factory::getUser();
 

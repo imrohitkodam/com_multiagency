@@ -39,7 +39,7 @@ class MultiagencyModelMultiagences extends ListModel
 				'created_by', 'a.`created_by`',
 				'modified_by', 'a.`modified_by`',
 				'title', 'a.`title`',
-				'manager_id', 'a.`manager_id`',
+
 				'country_id', 'a.`country_id`',
 				'state_id', 'a.`state_id`',
 			);
@@ -135,9 +135,7 @@ class MultiagencyModelMultiagences extends ListModel
 		$query->select('`modified_by`.name AS `modified_by`');
 		$query->join('LEFT', '#__users AS `modified_by` ON `modified_by`.id = a.`modified_by`');
 
-		// Join over the user field 'manager_id'
-		$query->select('`manager_id`.username AS `manager_id`');
-		$query->join('LEFT', '#__users AS `manager_id` ON `manager_id`.id = a.`manager_id`');
+
 
 		// Filter by published state
 		$published = $this->getState('filter.state');

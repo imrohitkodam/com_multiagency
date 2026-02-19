@@ -72,14 +72,14 @@ class MultiagencyViewUserform extends HtmlView
 		$this->trusteeRoleId = $this->params->get("organization_trustee_role_id", "0", "INT");
 
 		// Get the role list
-		FormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_multiagency/models/fields/');
+		FormHelper::addFieldPath(JPATH_SITE . '/components/com_multiagency/models/fields/');
 		$agency           = FormHelper::loadFieldType('agency', false);
-		$this->agencyList = $agency->getOptionsExternally();
+		$this->agencyList = $agency ? $agency->getOptionsExternally() : array();
 
 		// Get the related role list
 		FormHelper::addFieldPath(JPATH_SITE . '/plugins/system/dpe/fields/');
 		$relatedrole           = FormHelper::loadFieldType('relatedrole', false);
-		$this->relatedroleList = $relatedrole->getOptionsExternally();
+		$this->relatedroleList = $relatedrole ? $relatedrole->getOptionsExternally() : array();
 
 		if ($this->item->id && (!$this->editOwnUser && !$this->editUser && !$this->user->authorise('core.manageall', 'com_cluster')))
 		{

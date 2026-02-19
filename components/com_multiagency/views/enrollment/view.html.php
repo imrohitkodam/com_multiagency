@@ -14,6 +14,7 @@ use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Form\FormHelper;
 use Joomla\CMS\Language\Text;
+use Joomla\CMS\Component\ComponentHelper;
 
 jimport('joomla.application.component.view');
 
@@ -54,26 +55,43 @@ class MultiagencyViewEnrollment extends HtmlView
 		$this->courseId = $licenseData->course_id;
 		$this->agenciesId = $app->getUserStateFromRequest('.agencies', 'agencies');
 
-		FormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjlms/models/fields/');
-		$Courses = FormHelper::loadFieldType('courses', false);
-		$this->courseoptions = $Courses->getOptionsExternally();
-		$this->courseFilter = $app->getUserStateFromRequest('com_multiagency.enrollment.filter.selectedcourse', 'selectedcourse');
+		$this->courseoptions = array();
 
-		$helperPath = JPATH_ADMINISTRATOR . '/components/com_tjlms/helpers/tjlms.php';
-		JLoader::register('TjlmsHelper', $helperPath);
-		JLoader::load('TjlmsHelper');
-		$i = 0;
-
-		foreach ($this->courseoptions as $course)
+		if (ComponentHelper::isEnabled('com_tjlms'))
 		{
-			$canEnroll = TjlmsHelper::canManageCourseEnrollment($course->value);
+			FormHelper::addFieldPath(JPATH_ADMINISTRATOR . '/components/com_tjlms/models/fields/');
+			$Courses = FormHelper::loadFieldType('courses', false);
 
-			if (!$canEnroll)
+			if ($Courses)
 			{
-				unset($this->courseoptions[$i]);
+				$this->courseoptions = $Courses->getOptionsExternally();
 			}
 
-			$i++;
+			$this->courseFilter = $app->getUserStateFromRequest('com_multiagency.enrollment.filter.selectedcourse', 'selectedcourse');
+
+			$helperPath = JPATH_ADMINISTRATOR . '/components/com_tjlms/helpers/tjlms.php';
+
+			if (file_exists($helperPath))
+			{
+				JLoader::register('TjlmsHelper', $helperPath);
+				JLoader::load('TjlmsHelper');
+				$i = 0;
+
+				foreach ($this->courseoptions as $course)
+				{
+					if (class_exists('TjlmsHelper'))
+					{
+						$canEnroll = TjlmsHelper::canManageCourseEnrollment($course->value);
+
+						if (!$canEnroll)
+						{
+							unset($this->courseoptions[$i]);
+						}
+					}
+
+					$i++;
+				}
+			}
 		}
 
 		if (empty($this->courseFilter) && $this->licenseType === 'all')

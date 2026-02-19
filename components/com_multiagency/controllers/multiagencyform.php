@@ -264,7 +264,7 @@ class MultiagencyControllerMultiagencyForm extends FormController
 		try
 		{
 			// Get com_tjlms component status
-			if (ComponentHelper::getComponent('com_tjlms', true)->enabled)
+			if (ComponentHelper::isEnabled('com_tjlms'))
 			{
 				$helperPath = JPATH_ROOT . '/components/com_multiagency' . '/helpers/multiagency.php';
 
@@ -325,11 +325,24 @@ class MultiagencyControllerMultiagencyForm extends FormController
 	{
 		$path = JPATH_SITE . '/components/com_tjfields/helpers/geo.php';
 
-		if (!class_exists('tmtTestsHelper'))
+		if (!file_exists($path))
 		{
-			// Require_once $path
+			echo '[]';
+			Factory::getApplication()->close();
+			return;
+		}
+
+		if (!class_exists('TjGeoHelper'))
+		{
 			JLoader::register('TjGeoHelper', $path);
 			JLoader::load('TjGeoHelper');
+		}
+
+		if (!class_exists('TjGeoHelper'))
+		{
+			echo '[]';
+			Factory::getApplication()->close();
+			return;
 		}
 
 		$tjGeoHelper = TjGeoHelper::getInstance('TjGeoHelper');

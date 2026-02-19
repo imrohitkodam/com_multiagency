@@ -8,24 +8,30 @@
  */
 // No direct access
 defined('_JEXEC') or die;
-use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\MVC\Model\BaseDatabaseModel;
-use Joomla\CMS\Uri\Uri;
-use Joomla\CMS\Factory;
-use Joomla\CMS\Router\Route;
-use Joomla\CMS\Language\Text;
 
-HTMLHelper::addIncludePath(JPATH_ROOT . '/components/com_multiagency/helpers/html');
-HTMLHelper::_('bootstrap.tooltip');
-HTMLHelper::_('behavior.modal', 'a.tjmodal');
-HTMLHelper::_('behavior.multiselect');
-HTMLHelper::_('formbehavior.chosen', 'select');
-HTMLHelper::script( Uri::root().'components/com_tjlms/assets/js/tjlms.js' );
 
-JLoader::import('components.com_tjlms.helpers.main', JPATH_SITE);
-$tjlmsHelper = new ComtjlmsHelper;
 
-$user       = Factory::getUser();
+\Joomla\CMS\HTML\HTMLHelper::addIncludePath(JPATH_ROOT . '/components/com_multiagency/helpers/html');
+\Joomla\CMS\HTML\HTMLHelper::_('bootstrap.tooltip');
+// \Joomla\CMS\HTML\HTMLHelper::_('behavior.modal', 'a.tjmodal');
+\Joomla\CMS\HTML\HTMLHelper::_('behavior.multiselect');
+
+if (\Joomla\CMS\Component\ComponentHelper::isEnabled('com_tjlms'))
+{
+    \Joomla\CMS\HTML\HTMLHelper::script( \Joomla\CMS\Uri\Uri::root().'components/com_tjlms/assets/js/tjlms.js' );
+}
+
+$tjlmsHelper = null;
+if (\Joomla\CMS\Component\ComponentHelper::isEnabled('com_tjlms'))
+{
+    \JLoader::import('components.com_tjlms.helpers.main', JPATH_SITE);
+    if (class_exists('ComtjlmsHelper'))
+    {
+        $tjlmsHelper = new ComtjlmsHelper;
+    }
+}
+
+$user       = \Joomla\CMS\Factory::getUser();
 $userId     = $user->id;
 $listOrder  = $this->state->get('list.ordering');
 $listDirn   = $this->state->get('list.direction');
@@ -35,41 +41,41 @@ $canCheckin = $user->authorise('core.manage', 'com_multiagency');
 $canChange  = $user->authorise('core.edit.state', 'com_multiagency');
 $canDelete  = $user->authorise('core.delete', 'com_multiagency');
 
-JModelLegacy::addIncludePath(JPATH_SITE . '/components/com_multiagency/models');
-$licenseModel = BaseDatabaseModel::getInstance('Licences', 'MultiagencyModel', array('ignore_request' => true));
+\Joomla\CMS\MVC\Model\BaseDatabaseModel::addIncludePath(JPATH_SITE . '/components/com_multiagency/models');
+$licenseModel = \Joomla\CMS\MVC\Model\BaseDatabaseModel::getInstance('Licences', 'MultiagencyModel', array('ignore_request' => true));
 
 ?>
-<form action="<?php echo Route::_('index.php?option=com_multiagency&view=courses'); ?>" method="post" name="adminForm" id="adminForm">
-	<legend><?php echo Text::_("COM_MULTIAGENCY_TITLE_LIST_VIEW_COURSES");?></legend>
+<form action="<?php echo \Joomla\CMS\Router\Route::_('index.php?option=com_multiagency&view=courses'); ?>" method="post" name="adminForm" id="adminForm">
+	<legend><?php echo \Joomla\CMS\Language\Text::_("COM_MULTIAGENCY_TITLE_LIST_VIEW_COURSES");?></legend>
 	<div class="clearfix">&nbsp;</div>
 	<div class="clearfix">&nbsp;</div>
 	<div id="filter-progress-bar" class="btn-toolprogress-bar manage-courses dp-search-filter">
 		<div class="filter-search btn-group pull-left">
 <!--
 			<label for="filter_search" class="element-invisible">
-				<?php echo Text::_('JSEARCH_FILTER'); ?>
+				<?php echo \Joomla\CMS\Language\Text::_('JSEARCH_FILTER'); ?>
 			</label>
 -->
 			<input type="text" name="filter_search" id="filter_search"
-					placeholder="<?php echo Text::_('JSEARCH_FILTER'); ?>"
+					placeholder="<?php echo \Joomla\CMS\Language\Text::_('JSEARCH_FILTER'); ?>"
 					value="<?php echo $this->escape($this->state->get('filter.search')); ?>"
-					title="<?php echo Text::_('JSEARCH_FILTER'); ?>"/>
+					title="<?php echo \Joomla\CMS\Language\Text::_('JSEARCH_FILTER'); ?>"/>
 		</div>
 		<div class="pull-left">
 			<button class="btn btn-default" type="submit"
-					title="<?php echo Text::_('JSEARCH_FILTER_SUBMIT'); ?>">
+					title="<?php echo \Joomla\CMS\Language\Text::_('JSEARCH_FILTER_SUBMIT'); ?>">
 				<i class="icon-search"></i>
-			<button class="btn txt-gray mx-10" id="clear-search-button" type="button" title="<?php echo Text::_('JSEARCH_FILTER_CLEAR'); ?>"><?php echo Text::_('COM_MULTIAGENCY_SEARCH_FILTER_CLEAR'); ?></button>
+			<button class="btn txt-gray mx-10" id="clear-search-button" type="button" title="<?php echo \Joomla\CMS\Language\Text::_('JSEARCH_FILTER_CLEAR'); ?>"><?php echo \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_SEARCH_FILTER_CLEAR'); ?></button>
 		</div>
 		<div class="filter-search btn-group pull-left ml-1">
-		<?php  echo HTMLHelper::_('select.genericlist', $this->agencies, 'agencies[]', 'class="form-control"  name="agencies" onchange="this.form.submit();"', "value", "text",$this->agenciesId); ?>
+		<?php  echo \Joomla\CMS\HTML\HTMLHelper::_('select.genericlist', $this->agencies, 'agencies[]', 'class="form-control"  name="agencies" onchange="this.form.submit();"', "value", "text",$this->agenciesId); ?>
 		</div>
 
 		<div class="btn-group pull-right hidden-xm hidden-phone">
 <!--
 			<label for="limit"
 				   class="element-invisible">
-				<?php echo Text::_('JFIELD_PLG_SEARCH_SEARCHLIMIT_DESC'); ?>
+				<?php echo \Joomla\CMS\Language\Text::_('JFIELD_PLG_SEARCH_SEARCHLIMIT_DESC'); ?>
 			</label>
 -->
 			<?php //echo $this->pagination->getLimitBox(); ?>
@@ -86,18 +92,18 @@ $licenseModel = BaseDatabaseModel::getInstance('Licences', 'MultiagencyModel', a
 <!--
 					<?php //if (isset($this->items[0]->state)): ?>
 					<th width="5%">
-						<?php //echo HTMLHelper::_( 'grid.sort', 'JPUBLISHED', 'a.state', $listDirn, $listOrder); ?>
+						<?php //echo \Joomla\CMS\HTML\HTMLHelper::_( 'grid.sort', 'JPUBLISHED', 'a.state', $listDirn, $listOrder); ?>
 					</th>
 					<?php //endif; ?>
 -->
 					<th class=''>
-						<?php echo HTMLHelper::_( 'grid.sort', 'COM_MULTIAGENCY_LICENCES_COURSE_ID', 'b.title', $listDirn, $listOrder); ?>
+						<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'grid.sort', 'COM_MULTIAGENCY_LICENCES_COURSE_ID', 'b.title', $listDirn, $listOrder); ?>
 					</th>
 					<th class=''>
-						<?php echo HTMLHelper::_( 'grid.sort', 'COM_MULTIAGENCY_LICENCES_TOTAL_LICENCES', 'a.total_seats', $listDirn, $listOrder); ?>
+						<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'grid.sort', 'COM_MULTIAGENCY_LICENCES_TOTAL_LICENCES', 'a.total_seats', $listDirn, $listOrder); ?>
 					</th>
 					<th class=''>
-						<?php echo HTMLHelper::_( 'grid.sort', 'COM_MULTIAGENCY_LICENCES_USED_LICENCES', 'a.used_seats', $listDirn, $listOrder); ?>
+						<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'grid.sort', 'COM_MULTIAGENCY_LICENCES_USED_LICENCES', 'a.used_seats', $listDirn, $listOrder); ?>
 					</th>
 					<th class=''>
 						<?php echo JTEXT::_('COM_MULTIAGENCY_LICENCES_ACTIONS'); ?>
@@ -105,7 +111,7 @@ $licenseModel = BaseDatabaseModel::getInstance('Licences', 'MultiagencyModel', a
 <!--
 					<?php //if ($canEdit || $canDelete): ?>
 					<th class="center">
-						<?php //echo JText::_( 'COM_MULTIAGENCY_MULTIAGENCES_ACTIONS'); ?>
+						<?php //echo J\Joomla\CMS\Language\Text::_( 'COM_MULTIAGENCY_MULTIAGENCES_ACTIONS'); ?>
 					</th>
 					<?php //endif; ?>
 -->
@@ -150,15 +156,16 @@ $licenseModel = BaseDatabaseModel::getInstance('Licences', 'MultiagencyModel', a
 						<?php
 						if ($licenseModel->isValidLicense($item->id))
 						{
-							//$assignLink = $tjlmsHelper->tjlmsRoute( 'index.php?option=com_tjlms&view=enrolluser&tmpl=component&selectedcourse[]=' . $item->course_id . ',7&course_al=' . $item->access . '&type=assign', false);
-							$assignLink = $tjlmsHelper->tjlmsRoute( 'index.php?com_multiagency&view=enrollment&agency&license=' . $item->id . '&tmpl=component', false); ?>
-
-						<a class="btn btn-primary" onclick="openAssignRecommendPopups('<?php echo $assignLink;?>')" id="assign-modal-link" >
-							<?php echo JTEXT::_('COM_MULTIAGENCY_COURSES_ACTIONS_MANAGE_ENROLLMENTS');?>
-						</a>
+							$assignLink = '#';
+							if ($tjlmsHelper)
+							{
+								$assignLink = $tjlmsHelper->tjlmsRoute( 'index.php?com_multiagency&view=enrollment&agency&license=' . $item->id . '&tmpl=component', false);
+							}
+							?>
+							<a class="tjmodal btn btn-primary enrollment" href="<?php echo $assignLink; ?>" rel="{handler: 'iframe', size: {x: 800, y: 600}}" ><?php echo \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_COURSES_ASSIGN'); ?></a>
 						<?php } else
 						{
-							echo Text::_('COM_MULTIAGENCY_LICENCES_EXPIRE');
+							echo \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_LICENCES_EXPIRE');
 						}?>
 					</td>
 				</tr>
@@ -171,7 +178,7 @@ $licenseModel = BaseDatabaseModel::getInstance('Licences', 'MultiagencyModel', a
 		{
 			?>
 			<div class="clearfix">&nbsp;</div>
-			<div class="alert alert-info"><?php echo Text::_("COM_MULTIAGENCY_NO_RECORDS_FOUND");?></div>
+			<div class="alert alert-info"><?php echo \Joomla\CMS\Language\Text::_("COM_MULTIAGENCY_NO_RECORDS_FOUND");?></div>
 			<?php
 		}
 		?>
@@ -180,7 +187,7 @@ $licenseModel = BaseDatabaseModel::getInstance('Licences', 'MultiagencyModel', a
 	<input type="hidden" name="filter_order" value="<?php echo $listOrder; ?>" />
 	<input type="hidden" name="filter_order_Dir" value="<?php echo $listDirn; ?>" />
 
-	<?php echo HTMLHelper::_( 'form.token'); ?>
+	<?php echo \Joomla\CMS\HTML\HTMLHelper::_( 'form.token'); ?>
 </form>
 
 <script type="text/javascript">
@@ -194,7 +201,7 @@ $licenseModel = BaseDatabaseModel::getInstance('Licences', 'MultiagencyModel', a
 
 	function deleteItem() {
 
-		if (!confirm("<?php echo Text::_('COM_MULTIAGENCY_DELETE_MESSAGE'); ?>")) {
+		if (!confirm("<?php echo \Joomla\CMS\Language\Text::_('COM_MULTIAGENCY_DELETE_MESSAGE'); ?>")) {
 			return false;
 		}
 	}

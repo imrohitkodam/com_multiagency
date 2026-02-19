@@ -37,7 +37,7 @@
 		<field name="multiagency_id"
 			required="true"
 			type="sql"
-			query="select id, CONCAT(UCASE(LEFT(title, 1)),SUBSTRING(title, 2)) as value from z467w_tjmultiagency_multiagency WHERE `state` = 1 order by title asc"
+			query="select id, CONCAT(UCASE(LEFT(title, 1)),SUBSTRING(title, 2)) as value from #__tjmultiagency_multiagency WHERE `state` = 1 order by title asc"
 			key_field="id"
 			value_field="value"
 			onchange="checkExistingCourse(),licence.checkExistingLicence(this)"
