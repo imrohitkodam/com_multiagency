@@ -22,6 +22,9 @@ if (!Factory::getUser()->authorise('core.manage', 'com_multiagency'))
 
 JLoader::registerPrefix('Multiagency', JPATH_ADMINISTRATOR . '/components/com_multiagency');
 
-$controller = BaseController::getInstance('Multiagency');
+// Get the controller
+require_once JPATH_COMPONENT . '/controller.php';
+
+$controller = new MultiagencyController();
 $controller->execute(Factory::getApplication()->getInput()->get('task'));
 $controller->redirect();

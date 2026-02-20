@@ -9,20 +9,44 @@
 
 defined('_JEXEC') or die;
 use Joomla\CMS\Language\Text;
-
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Controller\BaseController;
 
 // Access check.
-if (!Factory::getApplication()->getIdentity()->authorise('core.manage', 'com_subusers'))
+if (!Factory::getUser()->authorise('core.manage', 'com_subusers'))
 {
 	throw new \Exception(Text::_('JERROR_ALERTNOAUTHOR'));
 }
 
-require_once JPATH_ADMINISTRATOR . '/components/com_subusers/includes/rbacl.php';
+\JLoader::import("/components/com_subusers/includes/rbacl", JPATH_ADMINISTRATOR);
 
-$app = Factory::getApplication();
-$mvcFactory = $app->bootComponent('com_subusers')->getMVCFactory();
-$controller = $mvcFactory->createController('Display', 'Administrator', [], $app, $app->getInput());
-$controller->execute($app->getInput()->get('task'));
+// Register the component prefix for autoloading
+JLoader::registerPrefix('Subusers', JPATH_ADMINISTRATOR . '/components/com_subusers');
+
+$input = Factory::getApplication()->getInput();
+$task = $input->get('task');
+
+// Get controller name from task or default to display
+$controllerName = 'Subusers';
+if (strpos($task, '.') !== false)
+{
+	list($controllerName, $task) = explode('.', $task, 2);
+	$controllerName = ucfirst($controllerName);
+}
+
+// Load the controller
+$controllerClass = 'SubusersController' . $controllerName;
+$controllerPath = JPATH_ADMINISTRATOR . '/components/com_subusers/controllers/' . strtolower($controllerName) . '.php';
+
+if (file_exists($controllerPath))
+{
+	require_once $controllerPath;
+	$controller = new $controllerClass;
+}
+else
+{
+	$controller = new BaseController;
+}
+
+$controller->execute($task);
 $controller->redirect();

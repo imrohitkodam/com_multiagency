@@ -9,6 +9,11 @@
 
 defined('_JEXEC') or die;
 
+use Joomla\CMS\Factory;
+use Joomla\CMS\Language\Text;
+use Joomla\CMS\Installer\Installer;
+use Joomla\CMS\Version;
+
 /**
  * Updates the structure of the component
  *
@@ -26,17 +31,17 @@ class Com_SubusersInstallerScript
 	 */
 	public function preflight($type, $parent)
 	{
-		$jversion = new \Joomla\CMS\Version;
+		$jversion = new Version;
 
 		// Installing component manifest file version
 		$manifest = $parent->getManifest();
-		$release  = (string) $manifest->version;
+		$release  = (string) $manifest['version'];
 
 		// Abort if the component wasn't build for the current Joomla version
 		if (!$jversion->isCompatible($release))
 		{
-			\Joomla\CMS\Factory::getApplication()->enqueueMessage(
-				\Joomla\CMS\Language\Text::_('This component is not compatible with installed Joomla version'),
+			Factory::getApplication()->enqueueMessage(
+				Text::_('This component is not compatible with installed Joomla version'),
 				'error'
 			);
 
@@ -44,52 +49,6 @@ class Com_SubusersInstallerScript
 		}
 
 		return true;
-	}
-
-	/**
-	 * Method called after install/update the component
-	 *
-	 * @param   string $type   Type of process [install | update]
-	 * @param   mixed  $parent Object who called this method
-	 *
-	 * @return void
-	 */
-	public function postflight($type, $parent)
-	{
-		// Install SQL files manually for Joomla 6 compatibility
-		if ($type === 'install') {
-			$this->installSql($parent);
-		}
-	}
-
-	/**
-	 * Install SQL files
-	 *
-	 * @param   mixed  $parent Object who called this method
-	 *
-	 * @return void
-	 */
-	private function installSql($parent)
-	{
-		$db = \Joomla\CMS\Factory::getDbo();
-		$sourcePath = $parent->getParent()->getPath('source');
-		
-		// Install main SQL file
-		$sqlFile = $sourcePath . '/administrator/sql/install.mysql.utf8.sql';
-		
-		if (file_exists($sqlFile)) {
-			$sql = file_get_contents($sqlFile);
-			
-			// Split SQL into individual queries
-			$queries = $db->splitSql($sql);
-			
-			foreach ($queries as $query) {
-				if (trim($query)) {
-					$db->setQuery($query);
-					$db->execute();
-				}
-			}
-		}
 	}
 
 	/**
@@ -103,12 +62,10 @@ class Com_SubusersInstallerScript
 	 */
 	public function install($parent)
 	{
-		// Install SQL tables first
-		$this->installSql($parent);
-		
 		$this->installPlugins($parent);
 		$this->installModules($parent);
 	}
+
 
 	/**
 	 * Installs plugins for this component
@@ -120,13 +77,19 @@ class Com_SubusersInstallerScript
 	private function installPlugins($parent)
 	{
 		$installationFolder = $parent->getParent()->getPath('source');
-		$app                 = \Joomla\CMS\Factory::getApplication();
+		$app                 = Factory::getApplication();
 
-		$plugins = $parent->getManifest()->plugins;
-
-		if ($plugins && is_countable($plugins->children()) && count($plugins->children()))
+		$manifest = $parent->getManifest();
+		$plugins = $manifest->plugins ?? null;
+		
+		if (!$plugins)
 		{
-			$db    = \Joomla\CMS\Factory::getDbo();
+			return;
+		}
+
+		if (count($plugins->children()))
+		{
+			$db    = Factory::getDbo();
 			$query = $db->getQuery(true);
 
 			foreach ($plugins->children() as $plugin)
@@ -134,7 +97,7 @@ class Com_SubusersInstallerScript
 				$pluginName  = (string) $plugin['plugin'];
 				$pluginGroup = (string) $plugin['group'];
 				$path        = $installationFolder . '/plugins/' . $pluginGroup;
-				$installer   = new \Joomla\CMS\Installer\Installer;
+				$installer   = new Installer;
 
 				if (!$this->isAlreadyInstalled('plugin', $pluginName, $pluginGroup))
 				{
@@ -207,11 +170,13 @@ class Com_SubusersInstallerScript
 	private function installModules($parent)
 	{
 		$installationFolder = $parent->getParent()->getPath('source');
-		$app                 = \Joomla\CMS\Factory::getApplication();
+		$app                 = Factory::getApplication();
 
-		if (!empty($parent->getManifest()->modules))
+		$manifest = $parent->getManifest();
+		$modules = $manifest->modules ?? null;
+		
+		if (!empty($modules))
 		{
-			$modules = $parent->getManifest()->modules;
 
 			if (count($modules->children()))
 			{
@@ -219,7 +184,7 @@ class Com_SubusersInstallerScript
 				{
 					$moduleName = (string) $module['module'];
 					$path       = $installationFolder . '/modules/' . $moduleName;
-					$installer  = new \Joomla\CMS\Installer\Installer;
+					$installer  = new Installer;
 
 					if (!$this->isAlreadyInstalled('module', $moduleName))
 					{
@@ -278,12 +243,18 @@ class Com_SubusersInstallerScript
 	 */
 	private function uninstallPlugins($parent)
 	{
-		$app     = \Joomla\CMS\Factory::getApplication();
-		$plugins = $parent->getManifest()->plugins;
+		$app     = Factory::getApplication();
+		$manifest = $parent->getManifest();
+		$plugins = $manifest->plugins ?? null;
+		
+		if (!$plugins)
+		{
+			return;
+		}
 
 		if (count($plugins->children()))
 		{
-			$db    = \Joomla\CMS\Factory::getDbo();
+			$db    = Factory::getDbo();
 			$query = $db->getQuery(true);
 
 			foreach ($plugins->children() as $plugin)
@@ -306,7 +277,7 @@ class Com_SubusersInstallerScript
 
 				if (!empty($extension))
 				{
-					$installer = new \Joomla\CMS\Installer\Installer;
+					$installer = new Installer;
 					$result    = $installer->uninstall('plugin', $extension);
 
 					if ($result)
@@ -331,15 +302,17 @@ class Com_SubusersInstallerScript
 	 */
 	private function uninstallModules($parent)
 	{
-		$app = \Joomla\CMS\Factory::getApplication();
+		$app = Factory::getApplication();
 
-		if (!empty($parent->getManifest()->modules))
+		$manifest = $parent->getManifest();
+		$modules = $manifest->modules ?? null;
+		
+		if (!empty($modules))
 		{
-			$modules = $parent->getManifest()->modules;
 
 			if (count($modules->children()))
 			{
-				$db    = \Joomla\CMS\Factory::getDbo();
+				$db    = Factory::getDbo();
 				$query = $db->getQuery(true);
 
 				foreach ($modules->children() as $plugin)
@@ -360,7 +333,7 @@ class Com_SubusersInstallerScript
 
 					if (!empty($extension))
 					{
-						$installer = new \Joomla\CMS\Installer\Installer;
+						$installer = new Installer;
 						$result    = $installer->uninstall('module', $extension);
 
 						if ($result)
