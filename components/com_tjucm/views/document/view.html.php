@@ -206,7 +206,15 @@ class TjucmViewDocument extends HtmlView
 
 		$phpWord->save($filename, 'Word2007', true);
 		*/
-		require_once JPATH_SITE . "/libraries/techjoomla/dompdf/autoload.inc.php";
+		// Load dompdf only if it exists
+		if (file_exists(JPATH_SITE . "/libraries/techjoomla/dompdf/autoload.inc.php"))
+		{
+			require_once JPATH_SITE . "/libraries/techjoomla/dompdf/autoload.inc.php";
+		}
+		else
+		{
+			throw new Exception('Dompdf library is not installed. Please install it at libraries/techjoomla/dompdf/');
+		}
 
 		$html = '<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"/></head><body>' .
 		$this->loadTemplate('body') . '</body></html>';

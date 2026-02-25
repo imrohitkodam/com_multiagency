@@ -30,7 +30,13 @@ use Dompdf\Options;
 
 
 
-require_once JPATH_SITE . '/libraries/techjoomla/dompdf/autoload.inc.php';
+$dompdfAutoload = JPATH_SITE . '/libraries/techjoomla/dompdf/autoload.inc.php';
+
+if (file_exists($dompdfAutoload))
+{
+	require_once $dompdfAutoload;
+}
+
 
 JLoader::import('components.com_sla.includes.sla', JPATH_ADMINISTRATOR);
 JLoader::import('components.com_cluster.includes.cluster', JPATH_ADMINISTRATOR);
