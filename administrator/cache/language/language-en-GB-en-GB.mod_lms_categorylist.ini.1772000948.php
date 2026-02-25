@@ -1,0 +1,16 @@
+<?php
+defined('_JEXEC') or die;
+return array (
+  'MOD_LMS_CATEGORYLIST' => 'LMS Category List',
+  'MOD_LMS_CATEGORYLIST_DESC' => 'Module to show the Category list from LMS Component',
+  'MOD_SUFIX' => 'Module Class Suffix',
+  'MOD_LMS_CATEGORYLIST_MODULECLASS_SFX_DESC' => 'A suffix to be applied to the CSS class of the module. This allows for individual module styling.',
+  'MOD_LMS_CATEGORYLIST_SCROLL_HEIGHT_LIMIT' => 'Scroll limit',
+  'MOD_LMS_CATEGORYLIST_SCROLL_HEIGHT_LIMIT_DESC' => 'Enter Scroll Limit',
+  'QTC_PROD_SEL_CAT_HEADER' => 'Select Category',
+  'MOD_LMS_CATEGORYLIST_FILTER_CAMP_CAT' => 'Categories',
+  'MOD_LMS_CATEGORYLIST_MY_ENROLLED_COURSES' => 'All My Enrolled Courses',
+  'MOD_LMS_CATEGORYLIST_MY_LIKED_COURSES' => 'All My Liked Courses',
+  'MOD_LMS_CATEGORYLIST_MY_RECOMMENDED_COURSES' => 'My Recommended Courses',
+  'MOD_LMS_CATEGORYLIST_ALL_COURSES' => 'All Courses',
+);

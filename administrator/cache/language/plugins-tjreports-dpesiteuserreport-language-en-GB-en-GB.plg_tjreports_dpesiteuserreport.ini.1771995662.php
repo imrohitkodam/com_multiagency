@@ -1,0 +1,9 @@
+<?php
+defined('_JEXEC') or die;
+return array (
+  'PLG_DPE_SITEUSERREPORT' => 'DPE Site User Report',
+  'PLG_DPE_SITEUSERREPORT_DESC' => 'DPE Site User Report',
+  'PLG_DPE_SITEUSERREPORT_TITLE' => 'DPE Site User Report',
+  'PLG_DPE_SELECT_ALL_AGENCY' => 'All',
+  'PLG_DPE_SELECT_NONE' => 'None',
+);

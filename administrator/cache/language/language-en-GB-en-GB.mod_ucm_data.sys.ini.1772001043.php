@@ -1,0 +1,6 @@
+<?php
+defined('_JEXEC') or die;
+return array (
+  'MOD_UCM_DATA' => 'UCM - data',
+  'MOD_UCM_DATA_XML_DESCRIPTION' => 'Module - Show UCM data',
+);

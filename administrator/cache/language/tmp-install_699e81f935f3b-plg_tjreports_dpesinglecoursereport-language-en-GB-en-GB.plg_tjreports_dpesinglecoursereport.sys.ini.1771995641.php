@@ -1,0 +1,6 @@
+<?php
+defined('_JEXEC') or die;
+return array (
+  'PLG_DPE_SINGLECOURSEREPORT' => 'DPE- Tj Single course report',
+  'PLG_DPE_SINGLECOURSEREPORT_DESC' => 'DPE Single course reports',
+);

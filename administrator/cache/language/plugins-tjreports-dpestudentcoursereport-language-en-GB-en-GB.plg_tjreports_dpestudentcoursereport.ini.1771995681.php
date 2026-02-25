@@ -1,0 +1,10 @@
+<?php
+defined('_JEXEC') or die;
+return array (
+  'PLG_DPE_STUDENTCOURSEREPORT' => 'Student Course Report',
+  'PLG_DPE_STUDENTCOURSEREPORT_DESC' => 'Student Course Report',
+  'PLG_DPE_STUDENTCOURSEREPORT_TITLE' => 'Student Course Report',
+  'PLG_TJREPORTS_DPE_DUE_DATE_FORMAT' => '%d-%m-%Y',
+  'PLG_TJREPORTS_DPE_DUE_DATE_PLACEHOLDER_FORM' => 'FROM',
+  'PLG_TJREPORTS_DPE_DUE_DATE_PLACEHOLDER_TO' => 'TO',
+);

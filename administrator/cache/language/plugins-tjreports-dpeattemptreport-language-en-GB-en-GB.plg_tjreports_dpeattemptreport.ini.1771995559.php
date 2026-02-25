@@ -1,0 +1,7 @@
+<?php
+defined('_JEXEC') or die;
+return array (
+  'PLG_TJREPORTS_ATTEMPTREPORT' => 'DPE Attempt Report',
+  'PLG_TJREPORTS_ATTEMPTREPORT_ATTEMPT_TITLE' => 'DPE Attempt',
+  'PLG_TJREPORTS_ATTEMPTREPORT_TITLE' => 'DPE Attempt Report',
+);

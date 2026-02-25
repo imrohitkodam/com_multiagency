@@ -1,0 +1,6 @@
+<?php
+defined('_JEXEC') or die;
+return array (
+  'PLG_SYSTEM_DPE_TJLMS_CLUSTER' => 'System Tjlms Cluster Plugin',
+  'PLG_SYSTEM_DPE_TJLMS_CLUSTER_DESC' => 'All Cluster related system triggers for shika',
+);
