@@ -13,9 +13,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Form\FormHelper;
-
-FormHelper::loadFieldClass('list');
-
+use Joomla\CMS\Form\Field\ListField;
 
 $doc = Factory::getDocument();
 $doc->addScriptDeclaration('const site_root = "' . Uri::root() . '"');
@@ -28,7 +26,7 @@ HTMLHelper::script('modules/mod_ucm_data/assets/js/ucmtype.js');
  * @package     Joomla.MPF
  * @subpackage  Form
  */
-class JFormFieldUcmtype extends JFormFieldList
+class JFormFieldUcmtype extends ListField
 {
 	/**
 	 * The form field type.

@@ -257,7 +257,7 @@ class  plgSystemDpehelix3 extends CMSPlugin
         }
             
         $body = Factory::getApplication()->getBody();
-        $preset = Helix3::Preset();
+        $preset = DpeHelix3::Preset();
 
         $body = str_replace('{helix_preset}', !empty($preset) ? $preset : '', $body);
         

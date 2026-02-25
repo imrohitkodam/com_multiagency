@@ -13,8 +13,7 @@ use Joomla\CMS\Language\Text;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Uri\Uri;
 use Joomla\CMS\Form\FormHelper;
-
-FormHelper::loadFieldClass('list');
+use Joomla\CMS\Form\Field\ListField;
 
 
 /**
@@ -23,7 +22,7 @@ FormHelper::loadFieldClass('list');
  * @package     Joomla.MPF
  * @subpackage  Form
  */
-class JFormFieldUcmfields extends JFormFieldList
+class JFormFieldUcmfields extends ListField
 {
 	/**
 	 * The form field type.

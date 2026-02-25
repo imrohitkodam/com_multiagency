@@ -14,15 +14,14 @@ use Joomla\CMS\HTML\HTMLHelper;
 use Joomla\CMS\Factory;
 use Joomla\CMS\MVC\Model\BaseDatabaseModel;
 use Joomla\CMS\Language\Text;
-
-FormHelper::loadFieldClass('list');
+use Joomla\CMS\Form\Field\ListField;
 
 /**
  * Supports an HTML select list of Roles
  *
  * @since  1.0.0
  */
-class JFormFieldRole extends JFormFieldList
+class JFormFieldRole extends ListField
 {
 	/**
 	 * The form field type.

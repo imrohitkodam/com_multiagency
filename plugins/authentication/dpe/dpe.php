@@ -77,6 +77,12 @@ class PlgAuthenticationDpe extends CMSPlugin
 		$user      = Factory::getUser($userData->id);
 		$allowedUserGroups = $this->params->get('dpe_usergroup');
 
+		// Ensure $allowedUserGroups is an array
+		if (!is_array($allowedUserGroups))
+		{
+			$allowedUserGroups = $allowedUserGroups ? array($allowedUserGroups) : array();
+		}
+
 		if (count(array_intersect($user->groups, $allowedUserGroups)) == 0)
 		{
 			// Check licenses if password is correct

@@ -3,11 +3,11 @@
 defined('JPATH_BASE') or die;
 use Joomla\CMS\Form\FormHelper;
 use Joomla\CMS\Factory;
+use Joomla\CMS\Form\Field\ListField;
 
 jimport('joomla.html.html');
 jimport('joomla.form.formfield');
 jimport('joomla.form.helper');
-JFormHelper::loadFieldClass('list');
 
 /**
  * Custom Field class for the Joomla Framework.
@@ -16,7 +16,7 @@ JFormHelper::loadFieldClass('list');
  * @subpackage	        com_my
  * @since		1.6
  */
-class JFormFieldDpetags extends JFormFieldList
+class JFormFieldDpetags extends ListField
 {
 	/**
 	 * The form field type.
